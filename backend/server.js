@@ -13,11 +13,9 @@ connectDb(uriDb);
 app.use(cors());
 app.use(express.json());
 
-const exercisesRouter = require('./routes/exercises');
 const usersRouter = require('./routes/users');
 const screamsRouter = require('./routes/screams');
 
-app.use('/exercises', exercisesRouter);
 app.use('/users', usersRouter);
 app.use('/screams', screamsRouter);
 

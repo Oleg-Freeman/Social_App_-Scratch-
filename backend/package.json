@@ -14,8 +14,7 @@
   "main": "server.js",
   "license": "MIT",
   "scripts": {
-    "lint": "./node_modules/.bin/eslint ./",
-    "start": "cross-env PORT=3001 nodemon index.js"
+    "start": "nodemon server"
   },
   "devDependencies": {},
   "dependencies": {
