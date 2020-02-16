@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const { registerValidation } = require('../middlewares/validation'); // loginValidation
+const { notloggedIn } = require('../middlewares/not-loggedin');
 
 router.route('/').get((req, res) => {
   User.find().sort({ createdAt: -1 })
@@ -33,7 +34,11 @@ router.route('/register').post(async(req, res) => {
 });
 
 // Login
-router.post('/login', (req, res, next) => {
+router.route('/login').post(notloggedIn, (req, res, next) => {
+// router.post('/login', isloggedIn, (req, res, next) => {
+  // const { error } = isloggedIn(req.body);
+  // if (error) return res.status(400).send(error.details[0].message);
+
   passport.authenticate('local', {
     successRedirect: '/screams',
     failureRedirect: '/users/login',

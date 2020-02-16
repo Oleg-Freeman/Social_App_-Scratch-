@@ -3,7 +3,7 @@ module.exports = {
     if (req.isAuthenticated()) {
       return next();
     }
-    console.lof('Please log in to view that resource');
+    console.log('Please log in to view that resource');
     res.redirect('/users/login');
   },
   forwardAuthenticated: function(req, res, next) {
@@ -12,4 +12,5 @@ module.exports = {
     }
     res.redirect('/');
   }
+
 };
