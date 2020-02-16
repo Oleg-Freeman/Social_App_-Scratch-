@@ -1,14 +1,34 @@
 const express = require('express');
+const app = express();
+
 const cors = require('cors');
 const connectDb = require('./db');
+const session = require('express-session');
+const passport = require('passport');
+// const flash = require('express-flash');
 
-require('dotenv').config();
+require('dotenv').config({ path: './config/.env' });
 
-const app = express();
+// Passport Config
+const initializePassport = require('./config/passport-config');
+initializePassport(passport);
 
 const port = process.env.PORT || 5000;
 const uriDb = process.env.ATLAS_URI;
 connectDb(uriDb);
+
+// app.use(flash());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false, // true
+    saveUninitialized: false // true
+  })
+);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(cors());
 app.use(express.json());

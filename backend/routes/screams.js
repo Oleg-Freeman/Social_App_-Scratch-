@@ -1,15 +1,16 @@
 const router = require('express').Router();
 const Scream = require('../models/screams.model');
+const { ensureAuthenticated } = require('../config/auth');
 
-router.route('/').get((req, res) => {
+router.route('/').get(ensureAuthenticated, (req, res) => {
   Scream.find().sort({ createdAt: -1 })
     .then(screams => res.json(screams))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/add').post((req, res) => {
+router.route('/add').post(ensureAuthenticated, (req, res) => {
   // const screamId = req.body.screamId; // _id: new mongoose.Types.ObjectId().toHexString(),
-  const userHandle = req.body.userHandle;
+  const userHandle = req.user.handle;
   const body = req.body.body;
   const createAt = req.body.createAt;
   const likeCount = req.body.likeCount;
@@ -29,19 +30,19 @@ router.route('/add').post((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/:id').get((req, res) => {
+router.route('/:id').get(ensureAuthenticated, (req, res) => {
   Scream.findById(req.params.id)
     .then(screams => res.json(screams))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/:id').delete((req, res) => {
+router.route('/:id').delete(ensureAuthenticated, (req, res) => {
   Scream.findByIdAndDelete(req.params.id)
     .then(() => res.json('Scream deleted.'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/update/:id').post((req, res) => {
+router.route('/update/:id').post(ensureAuthenticated, (req, res) => {
   Scream.findById(req.params.id)
     .then(screams => {
       // screams.screamId = req.body.screamId;// _id: new mongoose.Types.ObjectId().toHexString(),
