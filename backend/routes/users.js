@@ -3,16 +3,14 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 // Image upload
-// const Busboy = require('busboy');
-// const path = require('path');
-// const os = require('os');
-// const fs = require('fs');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-
-const { registerValidation } = require('../middlewares/validation'); // loginValidation
-const { notloggedIn } = require('../middlewares/not-loggedin');
-const { ensureAuthenticated } = require('../config/auth');
+// Validations
+const {
+  registerValidation,
+  ensureAuthenticated,
+  forwardAuthenticated
+} = require('../middlewares/validation');
 
 require('dotenv').config({ path: './config/.env' });
 
@@ -67,7 +65,7 @@ router.route('/register').post(async(req, res) => {
 });
 
 // Login
-router.route('/login').post(notloggedIn, (req, res, next) => {
+router.route('/login').post(forwardAuthenticated, (req, res, next) => {
 // router.post('/login', isloggedIn, (req, res, next) => {
   // const { error } = isloggedIn(req.body);
   // if (error) return res.status(400).send(error.details[0].message);
@@ -104,63 +102,12 @@ router.post('/image', ensureAuthenticated, upload.single('image'), function(req,
       return res.status(400).send('Error in image upload - ' + error);
     }
     else {
-      // User.find({ handle: req.user.handle }).then(users => {
-      //   console.log(users);
-      //   users.imageURL = result.secure_url;
-      //   console.log(users.imageURL);
-
-      //   users.save()
-      //     .then(() => res.json('Image uploaded!'))
-      //     .catch(err => res.status(400).json('Error: ' + err));
-      // }).catch(err => res.status(400).json('Error: ' + err));
-
       User.findOneAndUpdate({ handle: req.user.handle }, { imageURL: result.secure_url })
         .then(() => res.json('Image uploaded!'))
         .catch(err => res.status(400).json('Error: ' + err));
     }
   });
 });
-// router.route('/image').post(ensureAuthenticated, (req, res, next) => {
-//   const busboy = new Busboy({ headers: req.headers });
-
-//   let imageFileName;
-//   let imageToBeUploaded = {};
-
-//   busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-//     console.log(fieldname);
-//     console.log(filename);
-//     console.log(mimetype);
-
-//     const imageExtension = filename.split('.')[filename.split('.').length - 1];
-//     imageFileName = `${Math.round(Math.random() * 1000)}.${imageExtension}`;
-//     const filePath = path.join(os.tmpdir(), imageFileName);
-//     imageToBeUploaded = { filePath, mimetype };
-//     console.log(`filePath - ${filePath}`);
-
-//     file.pipe(fs.createWriteStream(filePath));
-//   });
-//   busboy.on('finish', () => {
-//     console.log(`imageToBeUploaded.filePath - ${imageToBeUploaded.filePath}`);
-
-//     cloudinary.uploader.upload(imageToBeUploaded.filePath, (error, result) => {
-//       if (error) {
-//         console.log(error);
-//         res.status(400).json('Upload Error: ' + error);
-//       }
-//       else {
-//         console.log(result);
-//         const imageURL = cloudinary.url(imageFileName, {
-//           width: 225,
-//           height: 225,
-//           crop: 'fill'
-//         });
-//         req.user.imageURL = imageURL;
-//         res.send('Image uploaded successfully!');
-//       };
-//     });
-//   });
-//   busboy.end(req.rawBody);
-// });
 
 // router.route('/update/:id').post((req, res) => {
 //   User.findById(req.params.id)

@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const Scream = require('../models/screams.model');
-const { ensureAuthenticated } = require('../config/auth');
+const { ensureAuthenticated } = require('../middlewares/validation');
 
 router.route('/').get(ensureAuthenticated, (req, res) => {
   Scream.find().sort({ createdAt: -1 })
