@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 
-require('dotenv').config();
-
 function connect(uri) {
-  mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }
+  mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+  }
   );
   const connection = mongoose.connection;
   connection.once('open', () => {
