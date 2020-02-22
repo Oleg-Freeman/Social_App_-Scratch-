@@ -62,7 +62,7 @@ module.exports = {
       bio: Joi.string().empty().not(' '),
       website: Joi.string().uri().empty().not(' '),
       location: Joi.string().empty().not(' '),
-      birthDay: Joi.date().empty().less('now').greater('1-1-1').iso().not(' ')
+      birthDay: Joi.date().empty().less('now').iso().not(' ')
     });
     return schema.validate(data);
   },

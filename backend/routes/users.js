@@ -9,7 +9,8 @@ const cloudinary = require('cloudinary').v2;
 const {
   registerValidation,
   ensureAuthenticated,
-  forwardAuthenticated
+  forwardAuthenticated,
+  userDetailsValidation
 } = require('../middlewares/validation');
 
 require('dotenv').config({ path: './config/.env' });
@@ -111,23 +112,24 @@ router.route('/image').post(ensureAuthenticated, upload.single('image'), functio
 
 // Add user details
 router.route('/update/:id').post((req, res) => {
-  // const userDetails = reduseUserDetails(req.body);
+  const { error } = userDetailsValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
 
   User.findById(req.params.id)
     .then(users => {
-      if (('bio' in req.body) && (req.body.bio !== null || req.body.bio !== undefined)) {
+      if (('bio' in req.body) && (req.body.bio !== undefined)) {
         users.bio = req.body.bio;
       }
-      if (('website' in req.body) && (req.body.website !== null || req.body.website !== undefined)) {
+      if (('website' in req.body) && (req.body.website !== undefined)) {
         if (req.body.website.trim().substring(0, 4) !== 'http') {
           users.website = `http://${req.body.website.trim()}`;
         }
         else users.website = req.body.website;
       }
-      if (('location' in req.body) && (Object.keys(req.body.location).length > 0 || req.body.location !== undefined)) {
+      if (('location' in req.body) && (req.body.location !== undefined)) {
         users.location = req.body.location;
       }
-      if (('birthDay' in req.body) && (req.body.birthDay !== null || req.body.birthDay !== undefined)) {
+      if (('birthDay' in req.body) && (req.body.birthDay !== undefined)) {
         users.birthDay = req.body.birthDay;
       }
 
