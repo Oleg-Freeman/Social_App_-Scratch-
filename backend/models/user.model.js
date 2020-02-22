@@ -18,7 +18,7 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
-  birthDay: { type: Number },
+  birthDay: { type: Date },
   imageURL: {
     type: String,
     required: true,

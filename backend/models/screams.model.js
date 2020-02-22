@@ -12,11 +12,6 @@ const screamSchema = new Schema({
     type: String,
     required: true
   },
-  createAt: {
-    type: Date,
-    required: true,
-    default: Date.now
-  },
   likeCount: {
     type: Number,
     required: true,
@@ -26,7 +21,12 @@ const screamSchema = new Schema({
     type: Number,
     required: true,
     default: 0
-  }
+  },
+  // comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comments' }]
+  comments: [{
+    body: { type: String },
+    userHandle: { type: String }
+  }]
 }, {
   timestamps: true
 }//, { _id: false }

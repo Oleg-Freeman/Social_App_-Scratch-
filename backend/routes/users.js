@@ -78,7 +78,7 @@ router.route('/login').post(forwardAuthenticated, (req, res, next) => {
 });
 
 // Logout
-router.get('/logout', (req, res) => {
+router.route('/logout').get((req, res) => {
   req.logout();
   // res.redirect('/users/login');
   res.send('Logged out');
@@ -96,7 +96,7 @@ router.route('/:id').delete((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.post('/image', ensureAuthenticated, upload.single('image'), function(req, res) {
+router.route('/image').post(ensureAuthenticated, upload.single('image'), function(req, res) {
   cloudinary.uploader.upload(req.file.path, function(error, result) {
     if (error) {
       return res.status(400).send('Error in image upload - ' + error);
@@ -109,16 +109,33 @@ router.post('/image', ensureAuthenticated, upload.single('image'), function(req,
   });
 });
 
-// router.route('/update/:id').post((req, res) => {
-//   User.findById(req.params.id)
-//     .then(users => {
-//       users.username = req.body.username;
+// Add user details
+router.route('/update/:id').post((req, res) => {
+  // const userDetails = reduseUserDetails(req.body);
 
-//       users.save()
-//         .then(() => res.json('User updated!'))
-//         .catch(err => res.status(400).json('Error: ' + err));
-//     })
-//     .catch(err => res.status(400).json('Error: ' + err));
-// });
+  User.findById(req.params.id)
+    .then(users => {
+      if (('bio' in req.body) && (req.body.bio !== null || req.body.bio !== undefined)) {
+        users.bio = req.body.bio;
+      }
+      if (('website' in req.body) && (req.body.website !== null || req.body.website !== undefined)) {
+        if (req.body.website.trim().substring(0, 4) !== 'http') {
+          users.website = `http://${req.body.website.trim()}`;
+        }
+        else users.website = req.body.website;
+      }
+      if (('location' in req.body) && (Object.keys(req.body.location).length > 0 || req.body.location !== undefined)) {
+        users.location = req.body.location;
+      }
+      if (('birthDay' in req.body) && (req.body.birthDay !== null || req.body.birthDay !== undefined)) {
+        users.birthDay = req.body.birthDay;
+      }
+
+      users.save()
+        .then(() => res.json('User updated!'))
+        .catch(err => res.status(400).json('Error: ' + err));
+    })
+    .catch(err => res.status(400).json('Error: ' + err));
+});
 
 module.exports = router;
