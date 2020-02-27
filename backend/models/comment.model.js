@@ -14,7 +14,23 @@ const commentSchema = new Schema({
   userHandle: {
     type: String,
     required: true
+  },
+  likeCount: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  commentCount: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  imageURL: {
+    type: String,
+    required: true,
+    default: 'https://res.cloudinary.com/freeman999/image/upload/v1581953970/noAvatar_whj5rm.png'
   }
+  // TO DO: Comments on comments
 }, {
   timestamps: true
 });

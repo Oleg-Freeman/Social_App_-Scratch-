@@ -22,11 +22,16 @@ const screamSchema = new Schema({
     required: true,
     default: 0
   },
-  // comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comments' }]
-  comments: [{
-    body: { type: String },
-    userHandle: { type: String }
-  }]
+  imageURL: {
+    type: String,
+    required: true,
+    default: 'https://res.cloudinary.com/freeman999/image/upload/v1581953970/noAvatar_whj5rm.png'
+  },
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comments' }]
+  // comments: [{
+  //   body: { type: String },
+  //   userHandle: { type: String }
+  // }]
 }, {
   timestamps: true
 }//, { _id: false }
