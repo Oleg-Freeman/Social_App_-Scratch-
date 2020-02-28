@@ -36,10 +36,12 @@ app.use(express.json());
 const usersRouter = require('./routes/users');
 const screamsRouter = require('./routes/screams');
 const commentsRouter = require('./routes/comments');
+const likesRouter = require('./routes/likes');
 
 app.use('/users', usersRouter);
 app.use('/screams', screamsRouter);
 app.use('/comments', commentsRouter);
+app.use('/likes', likesRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

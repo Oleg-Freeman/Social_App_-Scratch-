@@ -1,10 +1,18 @@
 const router = require('express').Router();
 const Scream = require('../models/screams.model');
+const Like = require('../models/like.model');
+const Comment = require('../models/comment.model');
 const { ensureAuthenticated, bodyValidation } = require('../middlewares/validation');
 
 router.route('/').get((req, res) => {
-  Scream.find().sort({ createdAt: -1 })
-    .populate('comments')
+  Scream.find()
+    .sort({ createdAt: -1 })
+    .populate({
+      path: 'comments likes',
+      populate: {
+        path: 'likes'
+      }
+    })
     .then(screams => res.json(screams))
     .catch(err => res.status(400).json('Error: ' + err));
 });
@@ -17,11 +25,13 @@ router.route('/add').post(ensureAuthenticated, (req, res) => {
   const userHandle = req.user.handle;
   const body = req.body.body;
   const imageURL = req.user.imageURL;
+  const userId = req.user._id;
 
   const newScream = new Scream({
     userHandle,
     body,
-    imageURL
+    imageURL,
+    userId
   });
 
   newScream.save()
@@ -30,14 +40,31 @@ router.route('/add').post(ensureAuthenticated, (req, res) => {
 });
 
 router.route('/:id').get((req, res) => {
-  Scream.findById(req.params.id).populate('comments')
+  Scream.findById(req.params.id)
+    .populate({
+      path: 'comments likes',
+      populate: {
+        path: 'likes'
+      }
+    })
     .then(scream => res.json(scream))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/:id').delete(ensureAuthenticated, (req, res) => {
   Scream.findByIdAndDelete(req.params.id)
-    .then(() => res.json('Scream deleted.'))
+    .then(scream => {
+      Like.deleteMany({ screamId: scream._id })
+        .catch(err => res.status(400).json('Error here: ' + err));
+      scream.comments.forEach(comment => {
+        console.log(comment);
+        Like.deleteMany({ screamId: comment.toString() })
+          .catch(err => res.status(400).json('Error: ' + err));
+      });
+      Comment.deleteMany({ screamId: scream._id })
+        .catch(err => res.status(400).json('Error: ' + err));
+    })
+    .then(() => res.json('Scream Deleted'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 

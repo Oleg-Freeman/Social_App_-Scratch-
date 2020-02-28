@@ -5,6 +5,7 @@ const { ensureAuthenticated, bodyValidation } = require('../middlewares/validati
 
 router.route('/').get((req, res) => {
   Comment.find().sort({ createdAt: -1 })
+    .populate('likes')
     .then(comments => res.json(comments))
     .catch(err => res.status(400).json('Error: ' + err));
 });
@@ -17,10 +18,12 @@ router.route('/add/:screamId').post(ensureAuthenticated, (req, res) => {
     const userHandle = req.user.handle;
     const body = req.body.body;
     const screamId = req.params.screamId;
+    const userId = req.user._id;
     const imageURL = req.user.imageURL;
 
     const newComment = new Comment({
       screamId,
+      userId,
       userHandle,
       body,
       imageURL

@@ -7,6 +7,10 @@ const commentSchema = new Schema({
     type: String,
     required: true
   },
+  userId: {
+    type: String,
+    required: true
+  },
   body: {
     type: String,
     required: true
@@ -29,7 +33,8 @@ const commentSchema = new Schema({
     type: String,
     required: true,
     default: 'https://res.cloudinary.com/freeman999/image/upload/v1581953970/noAvatar_whj5rm.png'
-  }
+  },
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Likes' }]
   // TO DO: Comments on comments
 }, {
   timestamps: true

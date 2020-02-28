@@ -8,6 +8,10 @@ const screamSchema = new Schema({
     type: String,
     required: true
   },
+  userId: {
+    type: String,
+    required: true
+  },
   body: {
     type: String,
     required: true
@@ -27,11 +31,8 @@ const screamSchema = new Schema({
     required: true,
     default: 'https://res.cloudinary.com/freeman999/image/upload/v1581953970/noAvatar_whj5rm.png'
   },
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comments' }]
-  // comments: [{
-  //   body: { type: String },
-  //   userHandle: { type: String }
-  // }]
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comments' }],
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Likes' }]
 }, {
   timestamps: true
 }//, { _id: false }
