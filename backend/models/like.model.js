@@ -7,12 +7,20 @@ const likeSchema = new Schema({
     type: String,
     required: true
   },
+  commentId: {
+    type: String
+  },
   userId: {
     type: String,
     required: true
   },
   userHandle: {
     type: String,
+    required: true
+  },
+  likeType: {
+    type: String,
+    enum: ['scream', 'comment'],
     required: true
   }
 }, {

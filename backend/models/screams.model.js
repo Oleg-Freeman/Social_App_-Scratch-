@@ -31,8 +31,14 @@ const screamSchema = new Schema({
     required: true,
     default: 'https://res.cloudinary.com/freeman999/image/upload/v1581953970/noAvatar_whj5rm.png'
   },
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comments' }],
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Likes' }]
+  comments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Comments'
+  }],
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Likes'
+  }]
 }, {
   timestamps: true
 }//, { _id: false }

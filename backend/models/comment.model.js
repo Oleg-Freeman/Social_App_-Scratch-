@@ -34,7 +34,10 @@ const commentSchema = new Schema({
     required: true,
     default: 'https://res.cloudinary.com/freeman999/image/upload/v1581953970/noAvatar_whj5rm.png'
   },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Likes' }]
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Likes'
+  }]
   // TO DO: Comments on comments
 }, {
   timestamps: true

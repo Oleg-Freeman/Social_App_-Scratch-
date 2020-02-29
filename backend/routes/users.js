@@ -37,13 +37,26 @@ const imageFilter = function(req, file, cb) {
 
 const upload = multer({ storage: storage, fileFilter: imageFilter });
 
+// Get all users from DB
 router.route('/').get((req, res) => {
-  User.find().sort({ createdAt: -1 })
+  User.find()
+    .sort({ createdAt: -1 })
+    .populate({
+      path: 'screams',
+      populate: {
+        path: 'comments likes',
+        populate: {
+          path: 'likes'
+        }
+      }
+    })
     .then(users => res.json(users))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+// Register new user
 router.route('/register').post(async(req, res) => {
+  // eslint-disable-next-line no-unused-vars
   const { email, password, password2, handle } = req.body;
 
   // Validate data
@@ -54,15 +67,21 @@ router.route('/register').post(async(req, res) => {
   const emailExist = await User.findOne({ email: req.body.email });
   if (emailExist) return res.status(400).send('Email is already exists');
 
-  const newUser = new User({ email, password, password2, handle });
+  const newUser = new User({ email, password, handle });
 
   // Hash password
   const salt = await bcrypt.genSalt(10);
   newUser.password = await bcrypt.hash(req.body.password, salt);
-
-  newUser.save()
-    .then(() => res.json('User added!'))
-    .catch(err => res.status(400).json('Error: ' + err));
+  try {
+    await newUser.save();
+    res.json('User added!');
+  }
+  catch (err) {
+    res.status(400).json('Error: ' + err);
+  }
+  // newUser.save()
+  //   .then(() => res.json('User added!'))
+  //   .catch(err => res.status(400).json('Error: ' + err));
 });
 
 // Login
@@ -85,18 +104,21 @@ router.route('/logout').get((req, res) => {
   res.send('Logged out');
 });
 
+// Get one user by ID
 router.route('/:id').get((req, res) => {
   User.findById(req.params.id)
     .then(users => res.json(users))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+// Delete user
 router.route('/:id').delete((req, res) => {
   User.findByIdAndDelete(req.params.id)
     .then(() => res.json('User deleted.'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+// upload user profie image avatar
 router.route('/image').post(ensureAuthenticated, upload.single('image'), function(req, res) {
   cloudinary.uploader.upload(req.file.path, function(error, result) {
     if (error) {
@@ -133,10 +155,9 @@ router.route('/update/:id').post((req, res) => {
         users.birthDay = req.body.birthDay;
       }
 
-      users.save()
-        .then(() => res.json('User updated!'))
-        .catch(err => res.status(400).json('Error: ' + err));
+      return users.save();
     })
+    .then(() => res.json('User updated!'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 

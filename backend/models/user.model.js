@@ -27,7 +27,16 @@ const userSchema = new Schema({
   },
   bio: { type: String },
   website: { type: String },
-  location: { type: String }
+  location: { type: String },
+  screamCount: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  screams: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Scream'
+  }]
 }, {
   timestamps: true
 });

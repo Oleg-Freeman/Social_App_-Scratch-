@@ -37,11 +37,13 @@ const usersRouter = require('./routes/users');
 const screamsRouter = require('./routes/screams');
 const commentsRouter = require('./routes/comments');
 const likesRouter = require('./routes/likes');
+const notificationsRouter = require('./routes/notifications');
 
 app.use('/users', usersRouter);
 app.use('/screams', screamsRouter);
 app.use('/comments', commentsRouter);
 app.use('/likes', likesRouter);
+app.use('/notifications', notificationsRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

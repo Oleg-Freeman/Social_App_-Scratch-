@@ -2,8 +2,11 @@ const router = require('express').Router();
 const Scream = require('../models/screams.model');
 const Like = require('../models/like.model');
 const Comment = require('../models/comment.model');
+const Notification = require('../models/notification.model');
+const User = require('../models/user.model');
 const { ensureAuthenticated, bodyValidation } = require('../middlewares/validation');
 
+// Get all screams
 router.route('/').get((req, res) => {
   Scream.find()
     .sort({ createdAt: -1 })
@@ -17,6 +20,7 @@ router.route('/').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+// Add new scream
 router.route('/add').post(ensureAuthenticated, (req, res) => {
   const { error } = bodyValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -35,10 +39,22 @@ router.route('/add').post(ensureAuthenticated, (req, res) => {
   });
 
   newScream.save()
+    .then(() => {
+      return User.findById(req.user._id);
+    })
+    .then(user => {
+      console.log(user);
+
+      user.screams.unshift(newScream._id);
+      user.screamCount = ++user.screamCount;
+
+      return user.save();
+    })
     .then(() => res.json('Scream added!'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+// Get one scream by ID
 router.route('/:id').get((req, res) => {
   Scream.findById(req.params.id)
     .populate({
@@ -51,23 +67,24 @@ router.route('/:id').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+// Delete one scream
 router.route('/:id').delete(ensureAuthenticated, (req, res) => {
   Scream.findByIdAndDelete(req.params.id)
     .then(scream => {
       Like.deleteMany({ screamId: scream._id })
-        .catch(err => res.status(400).json('Error here: ' + err));
-      scream.comments.forEach(comment => {
-        console.log(comment);
-        Like.deleteMany({ screamId: comment.toString() })
-          .catch(err => res.status(400).json('Error: ' + err));
-      });
+        .catch(err => res.status(400).json('Error: ' + err));
+
       Comment.deleteMany({ screamId: scream._id })
+        .catch(err => res.status(400).json('Error: ' + err));
+
+      Notification.deleteMany({ screamId: scream._id })
         .catch(err => res.status(400).json('Error: ' + err));
     })
     .then(() => res.json('Scream Deleted'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
+// Update scream
 router.route('/update/:id').post(ensureAuthenticated, (req, res) => {
   Scream.findById(req.params.id)
     .then(scream => {
