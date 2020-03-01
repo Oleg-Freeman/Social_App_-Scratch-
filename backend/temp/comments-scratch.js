@@ -1,8 +1,7 @@
-/* eslint-disable promise/always-return */
 const router = require('express').Router();
 const Pusher = require('pusher');
 const Comment = require('../models/comment.model');
-const Post = require('../models/post.model');
+const Scream = require('../models/screams.model');
 const Notification = require('../models/notification.model');
 const { ensureAuthenticated, bodyValidation } = require('../middlewares/validation');
 
@@ -24,9 +23,9 @@ router.route('/').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-// Get all comments on post
-router.route('/:postId').get((req, res) => {
-  Comment.find({ postId: req.param.postId })
+// Get all comments on scream
+router.route('/:screamId').get((req, res) => {
+  Comment.find({ screamId: req.param.screamId })
     .sort({ createdAt: -1 })
     .populate('likes')
     .then(comments => res.json(comments))
@@ -34,33 +33,33 @@ router.route('/:postId').get((req, res) => {
 });
 
 // Add new comment
-router.route('/add/:postId').post(ensureAuthenticated, (req, res) => {
+router.route('/add/:screamId').post(ensureAuthenticated, (req, res) => {
   const { error } = bodyValidation(req.body);
-  if (error) return res.status(400).json(error.details[0].message);
+  if (error) return res.status(400).send(error.details[0].message);
 
-  return Post.findById(req.params.postId)
-    .then(post => {
+  Scream.findById(req.params.screamId)
+    .then(scream => {
       const userHandle = req.user.handle;
       const body = req.body.body;
-      const postId = req.params.postId;
+      const screamId = req.params.screamId;
       const userId = req.user._id;
       const imageURL = req.user.imageURL;
 
       const newComment = new Comment({
-        postId,
+        screamId,
         userId,
         userHandle,
         body,
         imageURL
       });
 
-      return newComment.save()
+      newComment.save()
         .then(() => {
           const senderId = req.user._id;
           const senderName = req.user.handle;
-          const receiverId = post.userId;
-          const receiverName = post.userHandle;
-          // const postId = post._id;
+          const receiverId = scream.userId;
+          const receiverName = scream.userHandle;
+          const screamId = scream._id;
           const commentId = newComment._id;
           const notificationType = 'new-comment';
 
@@ -69,7 +68,7 @@ router.route('/add/:postId').post(ensureAuthenticated, (req, res) => {
             senderName,
             receiverId,
             receiverName,
-            postId,
+            screamId,
             commentId,
             notificationType
           });
@@ -83,36 +82,36 @@ router.route('/add/:postId').post(ensureAuthenticated, (req, res) => {
             })
             .catch(err => res.status(400).json('Notification Error: ' + err));
 
-          post.comments.unshift(newComment._id);
-          post.commentCount = ++post.commentCount;
+          scream.comments.unshift(newComment._id);
+          scream.commentCount = ++scream.commentCount;
 
-          post.save()
-            .catch(err => res.status(400).json('Post Error: ' + err));
+          scream.save()
+            .then(() => res.json('Comment added!'))
+            .catch(err => res.status(400).json('Scream Error: ' + err));
         })
         .catch(err => res.status(400).json('Comment Error: ' + err));
-    })
-    .then(() => res.json('Comment added!'))
-    .catch(err => res.status(400).json('Error, post not found: ' + err));
+    }).catch(err => res.status(400).json('Error, scream not found: ' + err));
 });
 
 // Delete comment
 router.route('/:commentId').delete(ensureAuthenticated, (req, res) => {
   Comment.findByIdAndDelete(req.params.commentId)
     .then(comment => {
-      return Post.findById(comment.postId)
-        .then(post => {
-          const toDelete = post.comments.findIndex(deleteMe => {
-            return deleteMe.toString() === req.params.commentId;
-          });
-          if (toDelete === -1) throw new Error('Comment not found');
-          else {
-            post.commentCount = --post.commentCount;
-            post.comments.splice(toDelete, 1);
-          }
-
-          return post.save()
-            .catch(err => res.status(400).json('Post Error: ' + err));
-        }).catch(err => res.status(400).json('Error, post not found: ' + err));
+      return Scream.findById(comment.screamId);
+    })
+    .then(scream => {
+      const toDelete = scream.comments.findIndex(deleteMe => {
+        return deleteMe.toString() === req.params.commentId;
+      });
+      if (toDelete === -1) res.status(400).json('Comment not found');
+      else {
+        scream.commentCount = --scream.commentCount;
+        scream.comments.splice(toDelete, 1);
+      }
+      return scream;
+    })
+    .then(scream => {
+      scream.save();
     })
     .then(() => {
       return Notification.findOneAndDelete({
@@ -121,14 +120,16 @@ router.route('/:commentId').delete(ensureAuthenticated, (req, res) => {
         notificationType: 'new-comment'
       });
     })
-    .then(() => res.json('Comment deleted.'))
+    .then(() => {
+      res.json('Comment deleted.');
+    })
     .catch(err => res.status(400).json('Error, comment not found: ' + err));
 });
 
 // Update comment
 router.route('/update/:commentId').post(ensureAuthenticated, (req, res) => {
   const { error } = bodyValidation(req.body);
-  if (error) return res.status(400).json(error.details[0].message);
+  if (error) return res.status(400).send(error.details[0].message);
 
   Comment.findOneAndUpdate({ _id: req.params.commentId }, { body: req.body.body })
     .then(() => res.json('Comment updated!'))

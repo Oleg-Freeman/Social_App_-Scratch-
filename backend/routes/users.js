@@ -1,3 +1,4 @@
+/* eslint-disable promise/no-promise-in-callback */
 const router = require('express').Router();
 const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
@@ -42,7 +43,7 @@ router.route('/').get((req, res) => {
   User.find()
     .sort({ createdAt: -1 })
     .populate({
-      path: 'screams',
+      path: 'posts',
       populate: {
         path: 'comments likes',
         populate: {
@@ -61,11 +62,11 @@ router.route('/register').post(async(req, res) => {
 
   // Validate data
   const { error } = registerValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).json(error.details[0].message);
 
   // Check if User Exists in DB
   const emailExist = await User.findOne({ email: req.body.email });
-  if (emailExist) return res.status(400).send('Email is already exists');
+  if (emailExist) return res.status(400).json('Email is already exists');
 
   const newUser = new User({ email, password, handle });
 
@@ -88,10 +89,10 @@ router.route('/register').post(async(req, res) => {
 router.route('/login').post(forwardAuthenticated, (req, res, next) => {
 // router.post('/login', isloggedIn, (req, res, next) => {
   // const { error } = isloggedIn(req.body);
-  // if (error) return res.status(400).send(error.details[0].message);
+  // if (error) return res.status(400).json(error.details[0].message);
 
   passport.authenticate('local', {
-    successRedirect: '/screams',
+    successRedirect: '/posts',
     failureRedirect: '/users/login',
     failureFlash: true
   })(req, res, next);
@@ -101,7 +102,7 @@ router.route('/login').post(forwardAuthenticated, (req, res, next) => {
 router.route('/logout').get((req, res) => {
   req.logout();
   // res.redirect('/users/login');
-  res.send('Logged out');
+  res.json('Logged out');
 });
 
 // Get one user by ID
@@ -122,7 +123,7 @@ router.route('/:id').delete((req, res) => {
 router.route('/image').post(ensureAuthenticated, upload.single('image'), function(req, res) {
   cloudinary.uploader.upload(req.file.path, function(error, result) {
     if (error) {
-      return res.status(400).send('Error in image upload - ' + error);
+      return res.status(400).json('Error in image upload - ' + error);
     }
     else {
       User.findOneAndUpdate({ handle: req.user.handle }, { imageURL: result.secure_url })
@@ -135,7 +136,7 @@ router.route('/image').post(ensureAuthenticated, upload.single('image'), functio
 // Add user details
 router.route('/update/:id').post((req, res) => {
   const { error } = userDetailsValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).json(error.details[0].message);
 
   User.findById(req.params.id)
     .then(users => {

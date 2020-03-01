@@ -19,7 +19,7 @@ const notificationSchema = new Schema({
     type: String,
     required: true
   },
-  screamId: {
+  postId: {
     type: String,
     required: true
   },
@@ -33,7 +33,7 @@ const notificationSchema = new Schema({
   },
   notificationType: {
     type: String,
-    enum: ['like-scream', 'like-comment', 'new-comment'],
+    enum: ['like-post', 'like-comment', 'new-comment'],
     required: true
   }
 }, {

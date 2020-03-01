@@ -6,7 +6,8 @@
     },
     "extends": [
         "plugin:react/recommended",
-        "standard"
+        "standard",
+        "plugin:promise/recommended"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -19,7 +20,8 @@
         "ecmaVersion": 2018
     },
     "plugins": [
-        "react"
+        "react",
+        "promise"
     ],
     "rules": {
         "semi": ["error", "always"],
@@ -28,6 +30,21 @@
         "linebreak-style": ["error", "windows"],
         "no-param-reassign": ["error", { "props": false }],
         "prefer-destructuring": ["error", {"object": false, "array": false}],
-        "brace-style": ["error", "stroustrup"]
+        "brace-style": ["error", "stroustrup"],
+        "promise/always-return": "error",
+        "promise/catch-or-return": "error",
+        "promise/no-nesting": "off"
+    },
+    "settings": {
+        "react": {
+          "createClass": "createReactClass", // Regex for Component Factory to use,
+                                             // default to "createReactClass"
+          "pragma": "React",  // Pragma to use, default to "React"
+          "version": "detect", // React version. "detect" automatically picks the version you have installed.
+                               // You can also use `16.0`, `16.3`, etc, if you want to override the detected value.
+                               // default to latest and warns if missing
+                               // It will default to "detect" in the future
+          "flowVersion": "0.53" // Flow version
+        }
     }
 }

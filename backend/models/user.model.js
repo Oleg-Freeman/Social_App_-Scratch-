@@ -28,14 +28,14 @@ const userSchema = new Schema({
   bio: { type: String },
   website: { type: String },
   location: { type: String },
-  screamCount: {
+  postCount: {
     type: Number,
     required: true,
     default: 0
   },
-  screams: [{
+  posts: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Scream'
+    ref: 'Posts'
   }]
 }, {
   timestamps: true

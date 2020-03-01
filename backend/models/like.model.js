@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const likeSchema = new Schema({
-  screamId: {
+  postId: {
     type: String,
     required: true
   },
@@ -20,7 +20,7 @@ const likeSchema = new Schema({
   },
   likeType: {
     type: String,
-    enum: ['scream', 'comment'],
+    enum: ['post', 'comment'],
     required: true
   }
 }, {

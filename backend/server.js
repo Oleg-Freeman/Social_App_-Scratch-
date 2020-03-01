@@ -34,13 +34,13 @@ app.use(cors());
 app.use(express.json());
 
 const usersRouter = require('./routes/users');
-const screamsRouter = require('./routes/screams');
+const postsRouter = require('./routes/posts');
 const commentsRouter = require('./routes/comments');
 const likesRouter = require('./routes/likes');
 const notificationsRouter = require('./routes/notifications');
 
 app.use('/users', usersRouter);
-app.use('/screams', screamsRouter);
+app.use('/posts', postsRouter);
 app.use('/comments', commentsRouter);
 app.use('/likes', likesRouter);
 app.use('/notifications', notificationsRouter);

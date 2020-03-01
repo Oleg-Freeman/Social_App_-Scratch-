@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const screamSchema = new Schema({
-  // screamId: { type: String, required: true },
+const postSchema = new Schema({
+  // postId: { type: String, required: true },
   userHandle: {
     type: String,
     required: true
@@ -44,6 +44,6 @@ const screamSchema = new Schema({
 }//, { _id: false }
 );
 
-const Scream = mongoose.model('Scream', screamSchema);
+const Post = mongoose.model('Posts', postSchema);
 
-module.exports = Scream;
+module.exports = Post;
