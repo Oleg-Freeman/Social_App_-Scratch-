@@ -99,8 +99,20 @@ router.route('/:id').delete(ensureAuthenticated, async(req, res) => {
         else {
           try {
             await Like.deleteMany({ postId: post._id });
+            // .exec((err, likes) => {
+            //   if (err) return res.status(400).json('Error: ' + err);
+            //   if (likes.nModified === 0) return res.status(400).json('Likes Not found');
+            // });
             await Comment.deleteMany({ postId: post._id });
+            // .exec((err, comments) => {
+            //   if (err) return res.status(400).json('Error: ' + err);
+            //   if (comments.nModified === 0) return res.status(400).json('Comments Not found');
+            // });
             await Notification.deleteMany({ postId: post._id });
+            // .exec((err, notifications) => {
+            //   if (err) return res.status(400).json('Error: ' + err);
+            //   if (notifications.nModified === 0) return res.status(400).json('Notifications Not found');
+            // });
             await User.findById(post.userId)
               .exec((err, user) => {
                 if (err) return res.status(400).json('Error: ' + err);

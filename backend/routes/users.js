@@ -56,7 +56,7 @@ router.route('/').get(async(req, res) => {
       })
       .exec((err, users) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (users === null) return res.status(400).json('No any registered users found');
+        else if (users === null || users.length === 0) return res.status(400).json('No any registered users found');
         else return res.json(users);
       });
   }
@@ -90,9 +90,6 @@ router.route('/register').post(async(req, res) => {
   catch (err) {
     res.status(400).json('Error: ' + err);
   }
-  // newUser.save()
-  //   .then(() => res.json('User added!'))
-  //   .catch(err => res.status(400).json('Error: ' + err));
 });
 
 // Login
@@ -140,9 +137,9 @@ router.route('/:id').get(async(req, res) => {
 });
 
 // Delete user
-router.route('/:id').delete(ensureAuthenticated, async(req, res) => {
+router.route('/:id').delete(ensureAuthenticated, (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.id)
+    User.findByIdAndDelete(req.params.id)
       .exec((err, user) => {
         if (err) return res.status(400).json('Error: ' + err);
         else if (user === null) return res.status(400).json('Error: user not found');
@@ -164,8 +161,20 @@ router.route('/image').post(ensureAuthenticated, upload.single('image'), async(r
       else {
         try {
           await User.findOneAndUpdate({ _id: req.user._id }, { imageURL: result.secure_url });
+          // .exec((err, user) => {
+          //   if (err) return res.status(400).json('Error: ' + err);
+          //   if (user === null) return res.status(400).json('User Not found');
+          // });
           await Post.updateMany({ userId: req.user._id }, { imageURL: result.secure_url });
+          // .exec((err, posts) => {
+          //   if (err) return res.status(400).json('Error: ' + err);
+          //   if (posts.nModified === 0) return res.status(400).json('Post Not found');
+          // });
           await Comment.updateMany({ userId: req.user._id }, { imageURL: result.secure_url });
+          // .exec((err, comments) => {
+          //   if (err) return res.status(400).json('Error: ' + err);
+          //   if (comments.nModified === 0) return res.status(400).json('Comments Not found');
+          // });
         }
         catch (err) {
           res.status(400).json('Error: ' + err);

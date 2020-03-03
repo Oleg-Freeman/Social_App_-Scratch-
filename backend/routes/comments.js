@@ -23,7 +23,7 @@ router.route('/').get(async(req, res) => {
       .populate('likes')
       .exec((err, comments) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (comments === null) return res.status(400).json('No any comments found');
+        else if (comments === null || comments.length === 0) return res.status(400).json('No any comments found');
         else return res.json(comments);
       });
   }
@@ -40,7 +40,7 @@ router.route('/:postId').get(async(req, res) => {
       .populate('likes')
       .exec((err, comments) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (comments === null) return res.status(400).json('No any comments on this post found');
+        else if (comments === null || comments.length === 0) return res.status(400).json('No any comments on this post found');
         else return res.json(comments);
       });
   }

@@ -22,7 +22,7 @@ router.route('/').get(async(req, res) => {
     await Like.find().sort({ createdAt: -1 })
       .exec((err, likes) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (likes === null) return res.status(400).json('No any likes found');
+        else if (likes === null || likes.length === 0) return res.status(400).json('No any likes found');
         else return res.json(likes);
       });
   }

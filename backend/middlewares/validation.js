@@ -25,7 +25,8 @@ module.exports = {
       return next();
     }
     console.log('Please log in to view that resource');
-    res.redirect('/users/login');
+    // return res.redirect('/users/login');
+    return res.status(400).json('Please log in to view that resource');
   },
 
   forwardAuthenticated: (req, res, next) => {
