@@ -20,8 +20,7 @@
         "ecmaVersion": 2018
     },
     "plugins": [
-        "react",
-        "promise"
+        "react"
     ],
     "rules": {
         "semi": ["error", "always"],
@@ -30,10 +29,7 @@
         "linebreak-style": ["error", "windows"],
         "no-param-reassign": ["error", { "props": false }],
         "prefer-destructuring": ["error", {"object": false, "array": false}],
-        "brace-style": ["error", "stroustrup"],
-        "promise/always-return": "error",
-        "promise/catch-or-return": "error",
-        "promise/no-nesting": "off"
+        "brace-style": ["error", "stroustrup"]
     },
     "settings": {
         "react": {
