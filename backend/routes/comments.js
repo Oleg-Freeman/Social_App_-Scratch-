@@ -56,7 +56,7 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
   else {
     try {
       await Post.findById(req.params.postId)
-        .exec((err, post) => {
+        .exec(async(err, post) => {
           if (err) return res.status(400).json('Error: ' + err);
           else if (post === null) return res.status(400).json('Internal error');
           else {
@@ -74,33 +74,33 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
               imageURL
             });
 
-            return newComment.save(() => {
-              post.comments.unshift(newComment._id);
-              post.commentCount = ++post.commentCount;
+            await newComment.save();
 
-              return post.save(() => {
-                const senderId = req.user._id;
-                const senderName = req.user.handle;
-                const receiverId = post.userId;
-                const receiverName = post.userHandle;
-                const commentId = newComment._id;
-                const notificationType = 'new-comment';
+            post.comments.unshift(newComment._id);
+            post.commentCount = ++post.commentCount;
 
-                const newNotification = new Notification({
-                  senderId,
-                  senderName,
-                  receiverId,
-                  receiverName,
-                  postId,
-                  commentId,
-                  notificationType
-                });
+            await post.save();
 
-                return newNotification.save(() => {
-                  pusher.trigger('Twitter', 'new-comment', {
-                    // message: 'hello world'
-                  });
-                });
+            const senderId = req.user._id;
+            const senderName = req.user.handle;
+            const receiverId = post.userId;
+            const receiverName = post.userHandle;
+            const commentId = newComment._id;
+            const notificationType = 'new-comment';
+
+            const newNotification = new Notification({
+              senderId,
+              senderName,
+              receiverId,
+              receiverName,
+              postId,
+              commentId,
+              notificationType
+            });
+
+            await newNotification.save(() => {
+              pusher.trigger('Twitter', 'new-comment', {
+                // message: 'hello world'
               });
             });
           }
@@ -122,27 +122,22 @@ router.route('/:commentId').delete(ensureAuthenticated, async(req, res) => {
         if (err) return res.status(400).json('Error: ' + err);
         else if (comment === null) return res.status(400).json('Comments not found');
         else {
-          try {
-            await Post.findById(comment.postId)
-              .exec((err, post) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (post === null) return res.status(400).json('Internal error');
+          await Post.findById(comment.postId)
+            .exec((err, post) => {
+              if (err) return res.status(400).json('Error: ' + err);
+              else if (post === null) return res.status(400).json('Internal error');
+              else {
+                const toDelete = post.comments.findIndex(deleteMe => {
+                  return deleteMe.toString() === req.params.commentId;
+                });
+                if (toDelete === -1) throw new Error('Comment not found');
                 else {
-                  const toDelete = post.comments.findIndex(deleteMe => {
-                    return deleteMe.toString() === req.params.commentId;
-                  });
-                  if (toDelete === -1) throw new Error('Comment not found');
-                  else {
-                    post.commentCount = --post.commentCount;
-                    post.comments.splice(toDelete, 1);
-                    return post.save();
-                  }
+                  post.commentCount = --post.commentCount;
+                  post.comments.splice(toDelete, 1);
+                  return post.save();
                 }
-              });
-          }
-          catch (err) {
-            res.status(400).json('Error: ' + err);
-          }
+              }
+            });
         }
       });
 

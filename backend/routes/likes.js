@@ -43,58 +43,52 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
         if (err) return res.status(400).json('Error: ' + err);
         else if (liked !== null) return res.status(400).json(`User ${req.user.handle} is already liked this post`);
         else {
-          try {
-            await Post.findById(req.params.postId)
-              .exec((err, post) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (post === null) return res.status(400).json('Internal error');
-                else {
-                  const userHandle = req.user.handle;
-                  const postId = req.params.postId;
-                  const userId = req.user._id;
-                  const likeType = 'post';
+          await Post.findById(req.params.postId)
+            .exec(async(err, post) => {
+              if (err) return res.status(400).json('Error: ' + err);
+              else if (post === null) return res.status(400).json('Internal error');
+              else {
+                const userHandle = req.user.handle;
+                const postId = req.params.postId;
+                const userId = req.user._id;
+                const likeType = 'post';
 
-                  const newLike = new Like({
-                    postId,
-                    userHandle,
-                    userId,
-                    likeType
+                const newLike = new Like({
+                  postId,
+                  userHandle,
+                  userId,
+                  likeType
+                });
+
+                await newLike.save();
+
+                post.likes.unshift(newLike._id);
+                post.likeCount = ++post.likeCount;
+
+                await post.save();
+
+                const senderId = req.user._id;
+                const senderName = req.user.handle;
+                const receiverId = post.userId;
+                const receiverName = post.userHandle;
+                const notificationType = 'like-post';
+
+                const newNotification = new Notification({
+                  senderId,
+                  senderName,
+                  receiverId,
+                  receiverName,
+                  postId,
+                  notificationType
+                });
+
+                await newNotification.save(() => {
+                  pusher.trigger('Twitter', 'like-post', {
+                    // message: 'hello world'
                   });
-
-                  return newLike.save(() => {
-                    post.likes.unshift(newLike._id);
-                    post.likeCount = ++post.likeCount;
-
-                    return post.save(() => {
-                      const senderId = req.user._id;
-                      const senderName = req.user.handle;
-                      const receiverId = post.userId;
-                      const receiverName = post.userHandle;
-                      const postId = post._id;
-                      const notificationType = 'like-post';
-
-                      const newNotification = new Notification({
-                        senderId,
-                        senderName,
-                        receiverId,
-                        receiverName,
-                        postId,
-                        notificationType
-                      });
-
-                      return newNotification.save(() => {
-                        pusher.trigger('Twitter', 'like-post', {
-                          // message: 'hello world'
-                        });
-                      });
-                    });
-                  });
-                }
-              });
-          }
-          catch (err) {
-            res.status(400).json('Error: ' + err);
-          }
+                });
+              }
+            });
         }
       });
     res.json(`Liked by ${req.user.handle}`);
@@ -116,29 +110,24 @@ router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
         if (err) return res.status(400).json('Error: ' + err);
         else if (liked === null) return res.status(400).json(`User ${req.user.handle} not liked this post yet`);
         else {
-          try {
-            await Post.findById(req.params.postId)
-              .exec((err, post) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (post === null) return res.status(400).json('Internal error');
+          await Post.findById(req.params.postId)
+            .exec((err, post) => {
+              if (err) return res.status(400).json('Error: ' + err);
+              else if (post === null) return res.status(400).json('Internal error');
+              else {
+                const toDelete = post.likes.findIndex(deleteMe => {
+                  return deleteMe.toString() === liked._id.toString();
+                });
+
+                if (toDelete === -1) return res.status(400).json('Already unliked');
                 else {
-                  const toDelete = post.likes.findIndex(deleteMe => {
-                    return deleteMe.toString() === liked._id.toString();
-                  });
+                  post.likeCount = --post.likeCount;
+                  post.likes.splice(toDelete, 1);
 
-                  if (toDelete === -1) return res.status(400).json('Already unliked');
-                  else {
-                    post.likeCount = --post.likeCount;
-                    post.likes.splice(toDelete, 1);
-
-                    return post.save();
-                  }
+                  return post.save();
                 }
-              });
-          }
-          catch (err) {
-            res.status(400).json('Error: ' + err);
-          }
+              }
+            });
         }
       });
 
@@ -170,62 +159,55 @@ router.route('/comments/add/:commentId').post(ensureAuthenticated, async(req, re
         if (err) return res.status(400).json('Error: ' + err);
         else if (liked === null) return res.status(400).json(`User ${req.user.handle} is already liked this comment`);
         else {
-          try {
-            await Comment.findById(req.params.commentId)
-              .exec((err, comment) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (comment === null) return res.status(400).json('Internal error');
-                else {
-                  const userHandle = req.user.handle;
-                  const postId = comment.postId;
-                  const userId = req.user._id;
-                  const commentId = comment._id;
-                  const likeType = 'comment';
+          await Comment.findById(req.params.commentId)
+            .exec(async(err, comment) => {
+              if (err) return res.status(400).json('Error: ' + err);
+              else if (comment === null) return res.status(400).json('Internal error');
+              else {
+                const userHandle = req.user.handle;
+                const postId = comment.postId;
+                const userId = req.user._id;
+                const commentId = comment._id;
+                const likeType = 'comment';
 
-                  const newLike = new Like({
-                    postId,
-                    userHandle,
-                    userId,
-                    commentId,
-                    likeType
+                const newLike = new Like({
+                  postId,
+                  userHandle,
+                  userId,
+                  commentId,
+                  likeType
+                });
+
+                await newLike.save();
+
+                comment.likes.unshift(newLike._id);
+                comment.likeCount = ++comment.likeCount;
+
+                await comment.save();
+
+                const senderId = req.user._id;
+                const senderName = req.user.handle;
+                const receiverId = comment.userId;
+                const receiverName = comment.userHandle;
+                const notificationType = 'like-comment';
+
+                const newNotification = new Notification({
+                  senderId,
+                  senderName,
+                  receiverId,
+                  receiverName,
+                  postId,
+                  commentId,
+                  notificationType
+                });
+
+                await newNotification.save(() => {
+                  pusher.trigger('Twitter', 'like-comment', {
+                    // message: 'hello world'
                   });
-
-                  return newLike.save(() => {
-                    comment.likes.unshift(newLike._id);
-                    comment.likeCount = ++comment.likeCount;
-
-                    return comment.save(() => {
-                      const senderId = req.user._id;
-                      const senderName = req.user.handle;
-                      const receiverId = comment.userId;
-                      const receiverName = comment.userHandle;
-                      const postId = comment.postId;
-                      const commentId = comment._id;
-                      const notificationType = 'like-comment';
-
-                      const newNotification = new Notification({
-                        senderId,
-                        senderName,
-                        receiverId,
-                        receiverName,
-                        postId,
-                        commentId,
-                        notificationType
-                      });
-
-                      return newNotification.save(() => {
-                        pusher.trigger('Twitter', 'like-comment', {
-                          // message: 'hello world'
-                        });
-                      });
-                    });
-                  });
-                }
-              });
-          }
-          catch (err) {
-            res.status(400).json('Error: ' + err);
-          }
+                });
+              }
+            });
         }
       });
 
@@ -248,29 +230,24 @@ router.route('/comments/:commentId').delete(ensureAuthenticated, async(req, res)
         if (err) return res.status(400).json('Error: ' + err);
         else if (liked === null) return res.status(400).json(`User ${req.user.handle} not liked this comment yet`);
         else {
-          try {
-            await Comment.findById(req.params.commentId)
-              .exec((err, comment) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (comment === null) return res.status(400).json('Internal error');
+          await Comment.findById(req.params.commentId)
+            .exec((err, comment) => {
+              if (err) return res.status(400).json('Error: ' + err);
+              else if (comment === null) return res.status(400).json('Internal error');
+              else {
+                const toDelete = comment.likes.findIndex(deleteMe => {
+                  return deleteMe.toString() === liked._id.toString();
+                });
+
+                if (toDelete === -1) return res.status(400).json('Allready unliked');
                 else {
-                  const toDelete = comment.likes.findIndex(deleteMe => {
-                    return deleteMe.toString() === liked._id.toString();
-                  });
+                  comment.likeCount = --comment.likeCount;
+                  comment.likes.splice(toDelete, 1);
 
-                  if (toDelete === -1) return res.status(400).json('Allready unliked');
-                  else {
-                    comment.likeCount = --comment.likeCount;
-                    comment.likes.splice(toDelete, 1);
-
-                    return comment.save();
-                  }
+                  return comment.save();
                 }
-              });
-          }
-          catch (err) {
-            res.status(400).json('Error: ' + err);
-          }
+              }
+            });
         }
       });
     await Notification.findOneAndDelete({

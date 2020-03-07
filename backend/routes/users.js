@@ -12,7 +12,7 @@ const cloudinary = require('cloudinary').v2;
 const {
   registerValidation,
   ensureAuthenticated,
-  forwardAuthenticated,
+  // forwardAuthenticated,
   userDetailsValidation
 } = require('../middlewares/validation');
 
@@ -93,16 +93,20 @@ router.route('/register').post(async(req, res) => {
 });
 
 // Login
-router.route('/login').post(forwardAuthenticated, (req, res, next) => {
+router.route('/login').post(async(req, res, next) => {
 // router.post('/login', isloggedIn, (req, res, next) => {
   // const { error } = isloggedIn(req.body);
   // if (error) return res.status(400).json(error.details[0].message);
-
-  passport.authenticate('local', {
-    successRedirect: '/posts',
-    failureRedirect: '/users/login',
-    failureFlash: true
-  })(req, res, next);
+  try {
+    await passport.authenticate('local', {
+      successRedirect: '/posts',
+      failureRedirect: '/users/login'
+    // failureFlash: true
+    })(req, res, next);
+  }
+  catch (err) {
+    console.log(err);
+  }
 });
 
 // Logout
@@ -159,26 +163,21 @@ router.route('/image').post(ensureAuthenticated, upload.single('image'), async(r
         return res.status(400).json('Error in image upload - ' + error);
       }
       else {
-        try {
-          await User.findOneAndUpdate({ _id: req.user._id }, { imageURL: result.secure_url });
-          // .exec((err, user) => {
-          //   if (err) return res.status(400).json('Error: ' + err);
-          //   if (user === null) return res.status(400).json('User Not found');
-          // });
-          await Post.updateMany({ userId: req.user._id }, { imageURL: result.secure_url });
-          // .exec((err, posts) => {
-          //   if (err) return res.status(400).json('Error: ' + err);
-          //   if (posts.nModified === 0) return res.status(400).json('Post Not found');
-          // });
-          await Comment.updateMany({ userId: req.user._id }, { imageURL: result.secure_url });
-          // .exec((err, comments) => {
-          //   if (err) return res.status(400).json('Error: ' + err);
-          //   if (comments.nModified === 0) return res.status(400).json('Comments Not found');
-          // });
-        }
-        catch (err) {
-          res.status(400).json('Error: ' + err);
-        }
+        await User.findOneAndUpdate({ _id: req.user._id }, { imageURL: result.secure_url });
+        // .exec((err, user) => {
+        //   if (err) return res.status(400).json('Error: ' + err);
+        //   if (user === null) return res.status(400).json('User Not found');
+        // });
+        await Post.updateMany({ userId: req.user._id }, { imageURL: result.secure_url });
+        // .exec((err, posts) => {
+        //   if (err) return res.status(400).json('Error: ' + err);
+        //   if (posts.nModified === 0) return res.status(400).json('Post Not found');
+        // });
+        await Comment.updateMany({ userId: req.user._id }, { imageURL: result.secure_url });
+        // .exec((err, comments) => {
+        //   if (err) return res.status(400).json('Error: ' + err);
+        //   if (comments.nModified === 0) return res.status(400).json('Comments Not found');
+        // });
       }
     });
   }
