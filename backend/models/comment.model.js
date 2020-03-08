@@ -15,7 +15,7 @@ const commentSchema = new Schema({
     type: String,
     required: true
   },
-  userHandle: {
+  userName: {
     type: String,
     required: true
   },

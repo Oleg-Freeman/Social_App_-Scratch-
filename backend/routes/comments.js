@@ -59,7 +59,7 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
           if (err) return res.status(400).json('Error: ' + err);
           else if (post === null) return res.status(400).json('Internal error');
           else {
-            const userHandle = req.user.handle;
+            const userName = req.user.userName;
             const body = req.body.body;
             const postId = req.params.postId;
             const userId = req.user._id;
@@ -68,7 +68,7 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
             const newComment = new Comment({
               postId,
               userId,
-              userHandle,
+              userName,
               body,
               imageURL
             });
@@ -81,9 +81,9 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
             await post.save();
 
             const senderId = req.user._id;
-            const senderName = req.user.handle;
+            const senderName = req.user.userName;
             const receiverId = post.userId;
-            const receiverName = post.userHandle;
+            const receiverName = post.userName;
             const commentId = newComment._id;
             const notificationType = 'new-comment';
 

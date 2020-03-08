@@ -14,7 +14,7 @@ const userSchema = new Schema({
     required: true,
     minlength: 6
   },
-  handle: {
+  userName: {
     type: String,
     required: true
   },

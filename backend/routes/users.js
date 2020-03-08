@@ -69,17 +69,41 @@ router.route('/').get(async(req, res) => {
 // Register new user
 router.route('/register').post(async(req, res) => {
   // eslint-disable-next-line no-unused-vars
-  const { email, password, password2, handle } = req.body;
+  const { email, password, password2, userName } = req.body;
 
   // Validate data
   const { error } = registerValidation(req.body);
-  if (error) return res.status(400).json(error.details[0].message);
+  // if (error) return res.status(400).json(error.details[0].message);
+  if (error && error.details[0].path[0] === 'email') {
+    return res.status(400).json({
+      email: error.details[0].message,
+      message: 'Wrong credentials, try again'
+    });
+  }
+  if (error && error.details[0].path[0] === 'password') {
+    return res.status(400).json({
+      password: error.details[0].message,
+      message: 'Wrong credentials, try again'
+    });
+  }
+  if (error && error.details[0].path[0] === 'password2') {
+    return res.status(400).json({
+      password2: 'Confirm password do not match',
+      message: 'Wrong credentials, try again'
+    });
+  }
+  if (error && error.details[0].path[0] === 'userName') {
+    return res.status(400).json({
+      userName: error.details[0].message,
+      message: 'Wrong credentials, try again'
+    });
+  }
 
   // Check if User Exists in DB
   const emailExist = await User.findOne({ email: req.body.email });
-  if (emailExist) return res.status(400).json('Email is already exists');
+  if (emailExist) return res.status(400).json({ message: 'Email is already exists' });
 
-  const newUser = new User({ email, password, handle });
+  const newUser = new User({ email, password, userName });
 
   // Hash password
   const salt = await bcrypt.genSalt(10);

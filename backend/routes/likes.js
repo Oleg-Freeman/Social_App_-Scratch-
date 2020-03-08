@@ -40,21 +40,21 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
     })
       .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (liked !== null) return res.status(400).json(`User ${req.user.handle} is already liked this post`);
+        else if (liked !== null) return res.status(400).json(`User ${req.user.userName} is already liked this post`);
         else {
           await Post.findById(req.params.postId)
             .exec(async(err, post) => {
               if (err) return res.status(400).json('Error: ' + err);
               else if (post === null) return res.status(400).json('Internal error');
               else {
-                const userHandle = req.user.handle;
+                const userName = req.user.userName;
                 const postId = req.params.postId;
                 const userId = req.user._id;
                 const likeType = 'post';
 
                 const newLike = new Like({
                   postId,
-                  userHandle,
+                  userName,
                   userId,
                   likeType
                 });
@@ -67,9 +67,9 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
                 await post.save();
 
                 const senderId = req.user._id;
-                const senderName = req.user.handle;
+                const senderName = req.user.userName;
                 const receiverId = post.userId;
-                const receiverName = post.userHandle;
+                const receiverName = post.userName;
                 const notificationType = 'like-post';
 
                 const newNotification = new Notification({
@@ -90,7 +90,7 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
             });
         }
       });
-    res.json(`Liked by ${req.user.handle}`);
+    res.json(`Liked by ${req.user.userName}`);
   }
   catch (err) {
     res.status(400).json('Error: ' + err);
@@ -107,7 +107,7 @@ router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
     })
       .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (liked === null) return res.status(400).json(`User ${req.user.handle} not liked this post yet`);
+        else if (liked === null) return res.status(400).json(`User ${req.user.userName} not liked this post yet`);
         else {
           await Post.findById(req.params.postId)
             .exec((err, post) => {
@@ -156,14 +156,14 @@ router.route('/comments/add/:commentId').post(ensureAuthenticated, async(req, re
     })
       .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (liked === null) return res.status(400).json(`User ${req.user.handle} is already liked this comment`);
+        else if (liked === null) return res.status(400).json(`User ${req.user.userName} is already liked this comment`);
         else {
           await Comment.findById(req.params.commentId)
             .exec(async(err, comment) => {
               if (err) return res.status(400).json('Error: ' + err);
               else if (comment === null) return res.status(400).json('Internal error');
               else {
-                const userHandle = req.user.handle;
+                const userName = req.user.userName;
                 const postId = comment.postId;
                 const userId = req.user._id;
                 const commentId = comment._id;
@@ -171,7 +171,7 @@ router.route('/comments/add/:commentId').post(ensureAuthenticated, async(req, re
 
                 const newLike = new Like({
                   postId,
-                  userHandle,
+                  userName,
                   userId,
                   commentId,
                   likeType
@@ -185,9 +185,9 @@ router.route('/comments/add/:commentId').post(ensureAuthenticated, async(req, re
                 await comment.save();
 
                 const senderId = req.user._id;
-                const senderName = req.user.handle;
+                const senderName = req.user.userName;
                 const receiverId = comment.userId;
-                const receiverName = comment.userHandle;
+                const receiverName = comment.userName;
                 const notificationType = 'like-comment';
 
                 const newNotification = new Notification({
@@ -210,7 +210,7 @@ router.route('/comments/add/:commentId').post(ensureAuthenticated, async(req, re
         }
       });
 
-    res.json(`Liked by ${req.user.handle}`);
+    res.json(`Liked by ${req.user.userName}`);
   }
   catch (err) {
     res.status(400).json('Error: ' + err);
@@ -227,7 +227,7 @@ router.route('/comments/:commentId').delete(ensureAuthenticated, async(req, res)
     })
       .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (liked === null) return res.status(400).json(`User ${req.user.handle} not liked this comment yet`);
+        else if (liked === null) return res.status(400).json(`User ${req.user.userName} not liked this comment yet`);
         else {
           await Comment.findById(req.params.commentId)
             .exec((err, comment) => {

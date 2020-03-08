@@ -35,13 +35,13 @@ router.route('/add').post(ensureAuthenticated, async(req, res) => {
     if (error) return res.status(400).json(error.details[0].message);
     else {
       // const postId = req.body.postId; // _id: new mongoose.Types.ObjectId().toHexString(),
-      const userHandle = req.user.handle;
+      const userName = req.user.userName;
       const body = req.body.body;
       const imageURL = req.user.imageURL;
       const userId = req.user._id;
 
       const newPost = new Post({
-        userHandle,
+        userName,
         body,
         imageURL,
         userId
