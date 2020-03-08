@@ -1,4 +1,3 @@
-/* eslint-disable promise/no-promise-in-callback */
 const router = require('express').Router();
 const User = require('../models/user.model');
 const Comment = require('../models/comment.model');
@@ -12,6 +11,8 @@ const cloudinary = require('cloudinary').v2;
 const {
   registerValidation,
   ensureAuthenticated,
+  loginValidation,
+  // isloggedIn,
   // forwardAuthenticated,
   userDetailsValidation
 } = require('../middlewares/validation');
@@ -94,14 +95,42 @@ router.route('/register').post(async(req, res) => {
 
 // Login
 router.route('/login').post(async(req, res, next) => {
-// router.post('/login', isloggedIn, (req, res, next) => {
-  // const { error } = isloggedIn(req.body);
-  // if (error) return res.status(400).json(error.details[0].message);
+  // if (req.user) {
+  //   console.log('User already logged in');
+  //   return res.json('User already logged in');
+  // }
+
+  const { error } = loginValidation(req.body);
+  if (error && error.details[0].path[0] === 'email') {
+    return res.status(400).json({
+      email: error.details[0].message,
+      message: 'Wrong credentials, try again'
+    });
+  }
+  if (error && error.details[0].path[0] === 'password') {
+    return res.status(400).json({
+      password: error.details[0].message,
+      message: 'Wrong credentials, try again'
+    });
+  }
   try {
     await passport.authenticate('local', {
-      successRedirect: '/posts',
-      failureRedirect: '/users/login'
+      // successRedirect: '/posts'
+      // failureRedirect: '/users/login'
     // failureFlash: true
+    }, (err, user, info) => {
+      if (err) {
+        return res.status(400).json(err);
+      }
+      if (!user) {
+        return res.status(400).json(info);
+      }
+      req.logIn(user, function(err) {
+        if (err) {
+          return res.status(400).json(err);
+        }
+        return res.redirect('/posts');
+      });
     })(req, res, next);
   }
   catch (err) {

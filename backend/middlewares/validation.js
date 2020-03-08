@@ -36,9 +36,10 @@ module.exports = {
     res.redirect('/');
   },
 
-  notloggedIn: (req, res, next) => {
+  isloggedIn: (req, res, next) => {
     if (req.user) {
-      res.send('User already logged in');
+      console.log('User already logged in');
+      return true;
     }
     else {
       next();

@@ -1,4 +1,3 @@
-/* eslint-disable promise/always-return */
 const router = require('express').Router();
 const Pusher = require('pusher');
 const Comment = require('../models/comment.model');

@@ -1,29 +1,58 @@
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-// import './App.css';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 
+// Components
 import Navbar from './components/navbar.component';
-import ExercisesList from './components/exercises-list.component';
-import EditExercise from './components/edit-exercise.component';
-import CreateExercise from './components/create-exercise.component';
-import CreateUser from './components/create-user.component';
+
+// Pages
+import Home from './pages/home.component';
+import Register from './pages/register.component';
+import Login from './pages/login.component';
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      light: '#7986cb',
+      main: '#3f51b5',
+      dark: '#303f9f',
+      contrastText: '#fff'
+    },
+    secondary: {
+      light: '#ff4081',
+      main: '#f50057',
+      dark: '#c51162',
+      contrastText: '#fff'
+    }
+  },
+  typography: {
+    useNextVariants: true
+  }
+});
 
 function App() {
   return (
-    <Router>
-      <Switch>
-        <div className="container">
-          <Navbar />
-          <br/>
-          <Route path="/" exact component={ExercisesList} />
-          <Route path="/edit/:id" component={EditExercise} />
-          <Route path="/create" component={CreateExercise} />
-          <Route path="/user" component={CreateUser} />
-        </div>
-      </Switch>
+    <MuiThemeProvider theme={theme}>
+      <div className="App">
+        <Router>
+          <Navbar/>
+          <div className="container">
+            <Switch>
 
-    </Router>
+              <Route path="/" exact component={Home} />
+              <Route path="/register" exact component={Register} />
+              <Route path="/login" exact component={Login} />
+              {/* <Route path="/user" component={CreateUser} /> */}
+
+            </Switch>
+          </div>
+        </Router>
+      </div>
+    </MuiThemeProvider>
+
   );
 }
 

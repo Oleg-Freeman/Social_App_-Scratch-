@@ -1,25 +1,21 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
+// MUI stuff
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Button from '@material-ui/core/Button';
+
 export default class Navbar extends Component {
   render() {
     return (
-      <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
-        <Link to="/" className="navbar-brand">ExcerTracker</Link>
-        <div className="collpase navbar-collapse">
-          <ul className="navbar-nav mr-auto">
-            <li className="navbar-item">
-              <Link to="/" className="nav-link">Exercises</Link>
-            </li>
-            <li className="navbar-item">
-              <Link to="/create" className="nav-link">Create Exercise Log</Link>
-            </li>
-            <li className="navbar-item">
-              <Link to="/user" className="nav-link">Create User</Link>
-            </li>
-          </ul>
-        </div>
-      </nav>
+      <AppBar position="fixed">
+        <Toolbar className="nav-container">
+          <Button color="inherit" component={Link} to="/">Home</Button>
+          <Button color="inherit" component={Link} to="login">Login</Button>
+          <Button color="inherit" component={Link} to="register">Register</Button>
+        </Toolbar>
+      </AppBar>
     );
   }
 }
