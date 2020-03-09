@@ -50,7 +50,11 @@ class Login extends Component {
     this.state = {
       email: '',
       password: '',
-      errors: []
+      errors: {
+        email: '',
+        password: '',
+        message: ''
+      }
     };
   }
 
@@ -73,14 +77,14 @@ class Login extends Component {
         this.props.history.push('/');
       }).catch(err => {
         this.setState({
-          errors: [
-            err.response.data.email,
-            err.response.data.password,
-            err.response.data.message
-          ],
+          errors: {
+            email: err.response.data.email,
+            password: err.response.data.password,
+            message: err.response.data.message
+          },
           loading: false
         });
-        console.log(this.state.errors);
+        console.log(err);
       });
   };
 
@@ -108,8 +112,8 @@ class Login extends Component {
               type="email"
               label="Email"
               className={classes.textField}
-              helperText={errors[0]}
-              error={!!errors[0]}
+              helperText={errors.email}
+              error={!!errors.email}
               value={this.state.email}
               onChange={this.handleChange}
               fullWidth
@@ -120,8 +124,8 @@ class Login extends Component {
               type="password"
               label="Password"
               className={classes.textField}
-              helperText={errors[1]}
-              error={!!errors[1]}
+              helperText={errors.password}
+              error={!!errors.password}
               value={this.state.password}
               onChange={this.handleChange}
               fullWidth
@@ -132,7 +136,7 @@ class Login extends Component {
               </Typography>
             )} */}
             <Typography variant="body2" className={classes.customError}>
-              {this.state.errors[2]}
+              {this.state.errors.message}
             </Typography>
 
             <Button

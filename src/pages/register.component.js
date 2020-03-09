@@ -52,7 +52,13 @@ class Register extends Component {
       password: '',
       password2: '',
       userName: '',
-      errors: []
+      errors: {
+        email: '',
+        password: '',
+        password2: '',
+        userName: '',
+        message: ''
+      }
     };
   }
 
@@ -77,13 +83,13 @@ class Register extends Component {
         this.props.history.push('/login');
       }).catch(err => {
         this.setState({
-          errors: [
-            err.response.data.email,
-            err.response.data.password,
-            err.response.data.password2,
-            err.response.data.userName,
-            err.response.data.message
-          ],
+          errors: {
+            email: err.response.data.email,
+            password: err.response.data.password,
+            password2: err.response.data.password2,
+            userName: err.response.data.userName,
+            message: err.response.data.message
+          },
           loading: false
         });
         console.log(this.state.errors);
@@ -114,8 +120,8 @@ class Register extends Component {
               type="email"
               label="Email"
               className={classes.textField}
-              helperText={errors[0]}
-              error={!!errors[0]}
+              helperText={errors.email}
+              error={!!errors.email}
               value={this.state.email}
               onChange={this.handleChange}
               fullWidth
@@ -126,8 +132,8 @@ class Register extends Component {
               type="password"
               label="Password"
               className={classes.textField}
-              helperText={errors[1]}
-              error={!!errors[1]}
+              helperText={errors.password}
+              error={!!errors.password}
               value={this.state.password}
               onChange={this.handleChange}
               fullWidth
@@ -138,8 +144,8 @@ class Register extends Component {
               type="password"
               label="Confirm Password"
               className={classes.textField}
-              helperText={errors[2]}
-              error={!!errors[2]}
+              helperText={errors.password2}
+              error={!!errors.password2}
               value={this.state.password2}
               onChange={this.handleChange}
               fullWidth
@@ -150,14 +156,14 @@ class Register extends Component {
               type="text"
               label="User Name"
               className={classes.textField}
-              helperText={errors[3]}
-              error={!!errors[3]}
+              helperText={errors.userName}
+              error={!!errors.userName}
               value={this.state.userName}
               onChange={this.handleChange}
               fullWidth
             />
             <Typography variant="body2" className={classes.customError}>
-              {this.state.errors[4]}
+              {this.state.errors.message}
             </Typography>
 
             <Button
