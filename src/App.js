@@ -1,9 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-// import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
+
+// Redux
+import { Provider } from 'react-redux';
+import store from './redux/store';
+// import { SET_AUTHENTICATED } from './redux/types';
+// import { logoutUser, getUserData } from './redux/actions/userActions';
 
 // Components
 import Navbar from './components/navbar.component';
@@ -36,7 +41,7 @@ const theme = createMuiTheme({
 function App() {
   return (
     <MuiThemeProvider theme={theme}>
-      <div className="App">
+      <Provider store={store}>
         <Router>
           <Navbar/>
           <div className="container">
@@ -50,7 +55,8 @@ function App() {
             </Switch>
           </div>
         </Router>
-      </div>
+      </Provider>
+
     </MuiThemeProvider>
 
   );

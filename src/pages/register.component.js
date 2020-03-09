@@ -1,9 +1,10 @@
+/* eslint-disable camelcase */
 import React, { Component } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 // import { Link } from 'react-router-dom';
 import AppIcon from '../images/icon.png';
-import axios from 'axios';
+// import axios from 'axios';
 
 // MUI Stuff
 import Grid from '@material-ui/core/Grid';
@@ -11,6 +12,10 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
+
+// Redux stuff
+import { connect } from 'react-redux';
+import { registerUser } from '../redux/actions/userActions';
 
 const styles = (theme) => ({
   form: {
@@ -62,38 +67,22 @@ class Register extends Component {
     };
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps.UI.errors) {
+      this.setState({ errors: nextProps.UI.errors });
+    }
+  }
+
   handleSubmit(event) {
     event.preventDefault();
-    this.setState({
-      loading: true
-    });
 
-    const userData = {
+    const newUserData = {
       email: this.state.email,
       password: this.state.password,
       password2: this.state.password2,
       userName: this.state.userName
     };
-
-    axios.post('http://localhost:5000/users/register', userData)
-      .then(res => {
-        this.setState({
-          loading: false
-        });
-        this.props.history.push('/login');
-      }).catch(err => {
-        this.setState({
-          errors: {
-            email: err.response.data.email,
-            password: err.response.data.password,
-            password2: err.response.data.password2,
-            userName: err.response.data.userName,
-            message: err.response.data.message
-          },
-          loading: false
-        });
-        console.log(this.state.errors);
-      });
+    this.props.registerUser(newUserData, this.props.history);
   };
 
   handleChange(event) {
@@ -103,8 +92,8 @@ class Register extends Component {
   };
 
   render() {
-    const { classes } = this.props;
-    const { errors, loading } = this.state;
+    const { classes, UI: { loading } } = this.props;
+    const { errors } = this.state;
     return (
       <Grid container className={classes.form}>
         <Grid item sm />
@@ -187,10 +176,18 @@ class Register extends Component {
 }
 Register.propTypes = {
   classes: PropTypes.object.isRequired,
-  history: PropTypes.object
-  // loginUser: PropTypes.func.isRequired,
-  // user: PropTypes.object.isRequired,
-  // UI: PropTypes.object.isRequired
+  history: PropTypes.object,
+  registerUser: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(Register);
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI
+});
+
+export default connect(
+  mapStateToProps,
+  { registerUser }
+)(withStyles(styles)(Register));
