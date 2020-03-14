@@ -1,8 +1,8 @@
 import {
   SET_USER,
   SET_AUTHENTICATED,
-  SET_UNAUTHENTICATED
-//   LOADING_USER,
+  SET_UNAUTHENTICATED,
+  LOADING_USER
 //   LIKE_POST,
 //   UNLIKE_POST,
 //   MARK_NOTIFICATIONS_READ
@@ -13,7 +13,8 @@ const initialState = {
   loading: false,
   credentials: {},
   likes: [],
-  notifications: []
+  notifications: [],
+  userId: ''
 };
 
 export default function(state = initialState, action) {
@@ -29,13 +30,13 @@ export default function(state = initialState, action) {
       return {
         authenticated: true,
         loading: false,
-        ...action.payload
+        credentials: { ...action.payload }
       };
-    // case LOADING_USER:
-    //   return {
-    //     ...state,
-    //     loading: true
-    //   };
+    case LOADING_USER:
+      return {
+        ...state,
+        loading: true
+      };
     // case LIKE_POST:
     //   return {
     //     ...state,

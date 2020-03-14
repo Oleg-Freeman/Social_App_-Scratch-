@@ -153,7 +153,8 @@ router.route('/login').post(async(req, res, next) => {
         if (err) {
           return res.status(400).json(err);
         }
-        return res.redirect('/posts');
+        // return res.redirect('/posts');
+        return res.json(user);
       });
     })(req, res, next);
   }

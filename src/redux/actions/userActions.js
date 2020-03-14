@@ -13,8 +13,14 @@ export const loginUser = (userData, history) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   axios.post('http://localhost:5000/users/login', userData)
     .then(res => {
-      dispatch(getUserData());
+      // console.log('Login Data');
+      // console.log(res.data);
+      // dispatch(getUserData());
       dispatch({ type: CLEAR_ERRORS });
+      dispatch({
+        type: SET_USER,
+        payload: res.data
+      });
       history.push('/');
     }).catch(err => {
       dispatch({
@@ -29,7 +35,7 @@ export const registerUser = (newUserData, history) => (dispatch) => {
   axios.post('http://localhost:5000/users/register', newUserData)
     .then((res) => {
     //   setAuthorizationHeader(res.data.token);
-      dispatch(getUserData());
+      // dispatch(getUserData());
       dispatch({ type: CLEAR_ERRORS });
       history.push('/login');
     })
@@ -47,11 +53,14 @@ export const registerUser = (newUserData, history) => (dispatch) => {
 //   dispatch({ type: SET_UNAUTHENTICATED });
 // };
 
-export const getUserData = () => (dispatch) => {
+export const getUserData = (userId) => (dispatch) => {
   dispatch({ type: LOADING_USER });
   axios
-    .get('http://localhost:5000/users/')
+    // .get('http://localhost:5000/users/')
+    .get(`http://localhost:5000/users/${userId}`)
     .then((res) => {
+      console.log('User Data');
+      console.log(res.data);
       dispatch({
         type: SET_USER,
         payload: res.data
