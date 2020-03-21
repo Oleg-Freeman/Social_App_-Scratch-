@@ -29,7 +29,19 @@ const styles = {
 class Post extends Component {
   render() {
     dayjs.extend(relativeTime);
-    const { classes, post: { body, userHandle, imageURL, createdAt, _id, likeCount, commentCount, userId } } = this.props;
+    const {
+      classes,
+      post: {
+        body,
+        userHandle,
+        imageURL,
+        createdAt,
+        _id,
+        likeCount,
+        commentCount,
+        userId
+      }
+    } = this.props;
     return (
       <Card className={classes.card}>
         <CardMedia
@@ -70,7 +82,9 @@ class Post extends Component {
 Post.propTypes = {
   card: PropTypes.string,
   image: PropTypes.string,
-  content: PropTypes.string
+  content: PropTypes.string,
+  classes: PropTypes.object.isRequired,
+  post: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(Post);

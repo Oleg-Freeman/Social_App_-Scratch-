@@ -2,8 +2,9 @@
 import React, { Component } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import AppIcon from '../images/icon.png';
+import Cookies from 'js-cookie';
 // import axios from 'axios';
 
 // MUI Stuff
@@ -106,6 +107,10 @@ class Login extends Component {
   render() {
     const { classes, UI: { loading } } = this.props;
     const { errors } = this.state;
+    // const isAuthenticated = window.localStorage.getItem('isAuthenticated');
+    const isAuthenticated = Cookies.get('user');
+    // console.log(isAuthenticated);
+    if (isAuthenticated) return <Redirect to='/'/>;
     return (
       <Grid container className={classes.form}>
         <Grid item sm />

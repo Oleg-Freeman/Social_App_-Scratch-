@@ -94,6 +94,11 @@ class Register extends Component {
   render() {
     const { classes, UI: { loading } } = this.props;
     const { errors } = this.state;
+
+    const isAuthenticated = window.localStorage.getItem('isAuthenticated');
+
+    if (isAuthenticated) return this.props.history.push('/');
+
     return (
       <Grid container className={classes.form}>
         <Grid item sm />

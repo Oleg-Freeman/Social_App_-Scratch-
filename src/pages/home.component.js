@@ -1,47 +1,45 @@
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
-import axios from 'axios';
-// import PropTypes from 'prop-types';
+// import axios from 'axios';
+import PropTypes from 'prop-types';
 
-import Post from '../components/post.component';
+import Post from '../components/post/post.component';
 import Profile from '../components/profile/profile.component';
 // import State from '../components/state.component';
 // import ScreamSkeleton from '../util/ScreamSkeleton';
 
-// import { connect } from 'react-redux';
-// import { getScreams } from '../redux/actions/dataActions';
+import { connect } from 'react-redux';
+import { getPosts } from '../redux/actions/dataActions';
 
-export default class home extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      posts: ''
-    };
-  }
+class Home extends Component {
+  // componentDidMount() {
+  //   axios.get('http://localhost:5000/posts')
+  //     .then(res => {
+  //       return this.setState({
+  //         posts: res.data
+  //       });
+  //     }).catch(err => console.log(err));
+  // }
 
   componentDidMount() {
-    axios.get('http://localhost:5000/posts')
-      .then(res => {
-        return this.setState({
-          posts: res.data
-        });
-      }).catch(err => console.log(err));
+    this.props.getPosts();
+    // console.log('posts');
+    // console.log(this.props.getPosts());
   }
 
   render() {
-    const recentPosts = this.state.posts ? (
-      // eslint-disable-next-line react/jsx-key
-      this.state.posts.map(post => <Post key={post._id} post={post}/>)
+    const { posts, loading } = this.props.data;
+    const recentScreamsMarkup = !loading ? (
+      posts.map(post => <Post key={post._id} post={post}/>)
     ) : <p>Loading...</p>;
     return (
       <Grid container spacing={10}>
         <Grid item sm={8} xs={12}>
-          {recentPosts}
+          {recentScreamsMarkup}
           {/* <State /> */}
         </Grid>
         <Grid item sm={4} xs={12}>
-          <Profile />
+          <Profile history={this.props.history}/>
           {/* <p>Profile</p> */}
         </Grid>
       </Grid>
@@ -49,16 +47,17 @@ export default class home extends Component {
   }
 }
 
-// home.propTypes = {
-//   getScreams: PropTypes.func.isRequired,
-//   data: PropTypes.object.isRequired
-// };
+Home.propTypes = {
+  getPosts: PropTypes.func.isRequired,
+  history: PropTypes.object,
+  data: PropTypes.object.isRequired
+};
 
-// const mapStateToProps = (state) => ({
-//   data: state.data
-// });
+const mapStateToProps = (state) => ({
+  data: state.data
+});
 
-// export default connect(
-// mapStateToProps,
-// { getScreams }
-// )(home);
+export default connect(
+  mapStateToProps,
+  { getPosts }
+)(Home);

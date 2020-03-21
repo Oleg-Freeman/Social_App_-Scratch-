@@ -3,9 +3,10 @@ const app = express();
 
 const cors = require('cors');
 const connectDb = require('./db');
-const session = require('express-session');
+// const session = require('express-session');
 const passport = require('passport');
-// const flash = require('express-flash');
+// const cookieSession = require('cookie-session');
+// const cookieParser = require('cookie-parser');
 
 require('dotenv').config({ path: './config/.env' });
 
@@ -17,18 +18,24 @@ const port = process.env.PORT || 5000;
 const uriDb = process.env.ATLAS_URI;
 connectDb(uriDb);
 
-// app.use(flash());
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false, // true
-    saveUninitialized: false // true
-  })
-);
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false, // true
+//     saveUninitialized: false // true
+//   })
+// );
+// app.use(cookieParser());
+// app.use(cookieSession({
+//   // maxAge: 60 * 60 * 1000,
+//   name: 'userSession',
+//   // path: '/',
+//   keys: [process.env.COOKIE_KEY]
+// }));
 
 // Passport middleware
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 
 app.use(cors());
 app.use(express.json());

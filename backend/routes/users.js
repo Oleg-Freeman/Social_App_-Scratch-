@@ -153,6 +153,9 @@ router.route('/login').post(async(req, res, next) => {
         if (err) {
           return res.status(400).json(err);
         }
+        user.isAuthenticated = true;
+        // console.log(req.cookies);
+
         // return res.redirect('/posts');
         return res.json(user);
       });
@@ -213,6 +216,7 @@ router.route('/:id').delete(ensureAuthenticated, (req, res) => {
 router.route('/image').post(ensureAuthenticated, upload.single('image'), async(req, res) => {
   try {
     await cloudinary.uploader.upload(req.file.path, async(error, result) => {
+      // console.log(req);
       if (error) {
         return res.status(400).json('Error in image upload - ' + error);
       }

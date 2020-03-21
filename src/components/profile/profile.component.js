@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
+// import Cookies from 'js-cookie';
 // import EditDetails from './EditDetails';
 import MyButton from '../../util/myButton';
 // import ProfileSkeleton from '../../util/profileSkeleton';
@@ -21,7 +22,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import KeyboardReturn from '@material-ui/icons/KeyboardReturn';
 // Redux
 import { connect } from 'react-redux';
-import { getUserData } from '../../redux/actions/userActions';
+import { getUserData, logoutUser, uploadImage } from '../../redux/actions/userActions';
 
 const styles = (theme) => ({
   // ...theme
@@ -70,34 +71,53 @@ const styles = (theme) => ({
 });
 
 class Profile extends Component {
-  // handleImageChange(event) {
-  //   const image = event.target.files[0];
-  //   const formData = new FormData();
-  //   formData.append('image', image, image.name);
-  //   this.props.uploadImage(formData);
-  // };
+  constructor() {
+    super();
 
-  // handleEditPicture() {
-  //   const fileInput = document.getElementById('imageInput');
-  //   fileInput.click();
-  // };
+    this.handleLogout = this.handleLogout.bind(this);
+    this.handleImageChange = this.handleImageChange.bind(this);
+    this.handleEditPicture = this.handleEditPicture.bind(this);
+  }
 
-  // handleLogout() {
-  //   this.props.logoutUser();
-  // };
+  componentDidMount() {
+    // console.log(this.props.history);
+    this.props.getUserData(window.localStorage.getItem('currentUserId'));
+  }
+
+  handleImageChange(event) {
+    const image = event.target.files[0];
+    const formData = new FormData();
+    formData.append('image', image, image.name);
+    this.props.uploadImage(formData);
+    console.log(formData);
+  };
+
+  handleEditPicture() {
+    const fileInput = document.getElementById('imageInput');
+    fileInput.click();
+  };
+
+  handleLogout() {
+    this.props.logoutUser(this.props.history);
+    // this.props.history.push('/');
+    window.location.reload();
+  };
 
   render() {
     const {
       classes,
       user: {
-        credentials: { _Id, userName, createdAt, imageURL, bio, website, location, birthDay }, // TO DO birthDay
-        loading,
-        authenticated
+        user: { _Id, userName, createdAt, imageURL, bio, website, location, birthDay },
+        loading
+        // authenticated
       }
     } = this.props;
+    const currentUserId = window.localStorage.getItem('currentUserId');
+    // console.log(currentUserId);
+    // const isAuthenticated = Cookies.get('userSession');
 
     const profileMarkup = !loading ? (
-      authenticated ? (
+      currentUserId ? (
         <Paper className={classes.paper}>
           <div className={classes.profile}>
             <div className="image-wrapper">
@@ -177,7 +197,7 @@ class Profile extends Component {
               component={Link}
               to="/register"
             >
-              Signup
+              Register
             </Button>
           </div>
         </Paper>
@@ -195,14 +215,15 @@ const mapStateToProps = (state) => ({
   user: state.user
 });
 
-const mapActionsToProps = { getUserData };
+const mapActionsToProps = { getUserData, logoutUser, uploadImage };
 
 Profile.propTypes = {
-  // logoutUser: PropTypes.func.isRequired,
-  // uploadImage: PropTypes.func.isRequired,
+  logoutUser: PropTypes.func.isRequired,
+  uploadImage: PropTypes.func.isRequired,
   getUserData: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
 };
 
 export default connect(

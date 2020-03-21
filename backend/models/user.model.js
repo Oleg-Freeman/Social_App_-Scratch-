@@ -35,7 +35,12 @@ const userSchema = new Schema({
   posts: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Posts'
-  }]
+  }],
+  isAuthenticated: {
+    type: Boolean,
+    required: true,
+    default: false
+  }
 }, {
   timestamps: true
 });

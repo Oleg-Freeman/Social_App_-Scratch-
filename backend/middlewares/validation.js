@@ -21,8 +21,12 @@ module.exports = {
   },
 
   ensureAuthenticated: (req, res, next) => {
+    console.log('user', req.user);
+    console.log('headers', req.headers);
     if (req.isAuthenticated()) {
-      return next();
+      if (req.body) {
+        return next();
+      }
     }
     console.log('Please log in to view that resource');
     // return res.redirect('/users/login');
