@@ -4,18 +4,18 @@ module.exports = {
 
   registerValidation: (data) => {
     const schema = Joi.object({
-      email: Joi.string().min(6).required().email(),
-      password: Joi.string().min(6).required(),
+      email: Joi.string().required().min(6).max(254).email().lowercase(),
+      password: Joi.string().min(6).max(72, 'utf8').required(),
       password2: Joi.any().valid(Joi.ref('password')).required(),
-      userName: Joi.string().min(3).required()
+      userName: Joi.string().min(3).max(128).required()
     });
     return schema.validate(data);
   },
 
   loginValidation: (data) => {
     const schema = Joi.object({
-      email: Joi.string().min(6).required().email(),
-      password: Joi.string().min(6).required()
+      email: Joi.string().required().min(6).max(254).email().lowercase(),
+      password: Joi.string().min(6).max(72, 'utf8').required()
     });
     return schema.validate(data);
   },
@@ -41,14 +41,25 @@ module.exports = {
   },
 
   isloggedIn: (req, res, next) => {
-    if (req.user) {
+    if (req.session.user) {
       console.log('User already logged in');
-      return true;
+      return res.json({ authenticated: true });
     }
     else {
       next();
     }
   },
+
+  isNotloggedIn: (req, res, next) => {
+    if (!req.session.user) {
+      console.log('User not logged in');
+      return res.json({ authenticated: false });
+    }
+    else {
+      next();
+    }
+  },
+
   reduseUserDetails: (data) => {
     const userDetails = {};
     if (!data.bio.trim().isEmpty()) userDetails.bio = data.bio;

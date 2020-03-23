@@ -35,10 +35,10 @@ router.route('/add').post(ensureAuthenticated, async(req, res) => {
     if (error) return res.status(400).json(error.details[0].message);
     else {
       // const postId = req.body.postId; // _id: new mongoose.Types.ObjectId().toHexString(),
-      const userName = req.user.userName;
+      const userName = req.session.user.userName;
       const body = req.body.body;
-      const imageURL = req.user.imageURL;
-      const userId = req.user._id;
+      const imageURL = req.session.user.imageURL;
+      const userId = req.session.user._id;
 
       const newPost = new Post({
         userName,
@@ -48,7 +48,7 @@ router.route('/add').post(ensureAuthenticated, async(req, res) => {
       });
 
       await newPost.save();
-      await User.findById(req.user._id)
+      await User.findById(req.session.user._id)
         .exec((err, user) => {
           if (err) return res.status(400).json('Error: ' + err);
           else if (user === null) return res.status(400).json('Internal error');

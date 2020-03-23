@@ -59,11 +59,11 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
           if (err) return res.status(400).json('Error: ' + err);
           else if (post === null) return res.status(400).json('Internal error');
           else {
-            const userName = req.user.userName;
+            const userName = req.session.user.userName;
             const body = req.body.body;
             const postId = req.params.postId;
-            const userId = req.user._id;
-            const imageURL = req.user.imageURL;
+            const userId = req.session.user._id;
+            const imageURL = req.session.user.imageURL;
 
             const newComment = new Comment({
               postId,
@@ -80,8 +80,8 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
 
             await post.save();
 
-            const senderId = req.user._id;
-            const senderName = req.user.userName;
+            const senderId = req.session.user._id;
+            const senderName = req.session.user.userName;
             const receiverId = post.userId;
             const receiverName = post.userName;
             const commentId = newComment._id;
@@ -142,7 +142,7 @@ router.route('/:commentId').delete(ensureAuthenticated, async(req, res) => {
 
     await Notification.findOneAndDelete({
       commentId: req.params.commentId,
-      senderId: req.user._id,
+      senderId: req.session.user._id,
       notificationType: 'new-comment'
     })
       .exec((err, notification) => {

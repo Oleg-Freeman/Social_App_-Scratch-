@@ -34,22 +34,22 @@ router.route('/').get(async(req, res) => {
 router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
   try {
     await Like.findOne({
-      userId: req.user._id,
+      userId: req.session.user._id,
       postId: req.params.postId,
       likeType: 'post'
     })
       .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (liked !== null) return res.status(400).json(`User ${req.user.userName} is already liked this post`);
+        else if (liked !== null) return res.status(400).json(`User ${req.session.user.userName} is already liked this post`);
         else {
           await Post.findById(req.params.postId)
             .exec(async(err, post) => {
               if (err) return res.status(400).json('Error: ' + err);
               else if (post === null) return res.status(400).json('Internal error');
               else {
-                const userName = req.user.userName;
+                const userName = req.session.user.userName;
                 const postId = req.params.postId;
-                const userId = req.user._id;
+                const userId = req.session.user._id;
                 const likeType = 'post';
 
                 const newLike = new Like({
@@ -66,8 +66,8 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
 
                 await post.save();
 
-                const senderId = req.user._id;
-                const senderName = req.user.userName;
+                const senderId = req.session.user._id;
+                const senderName = req.session.user.userName;
                 const receiverId = post.userId;
                 const receiverName = post.userName;
                 const notificationType = 'like-post';
@@ -90,7 +90,7 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
             });
         }
       });
-    res.json(`Liked by ${req.user.userName}`);
+    res.json(`Liked by ${req.session.user.userName}`);
   }
   catch (err) {
     res.status(400).json('Error: ' + err);
@@ -101,13 +101,13 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
 router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
   try {
     await Like.findOneAndDelete({
-      userId: req.user._id,
+      userId: req.session.user._id,
       postId: req.params.postId,
       likeType: 'post'
     })
       .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (liked === null) return res.status(400).json(`User ${req.user.userName} not liked this post yet`);
+        else if (liked === null) return res.status(400).json(`User ${req.session.user.userName} not liked this post yet`);
         else {
           await Post.findById(req.params.postId)
             .exec((err, post) => {
@@ -131,7 +131,7 @@ router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
       });
 
     await Notification.findOneAndDelete({
-      senderId: req.user._id,
+      senderId: req.session.user._id,
       postId: req.params.postId,
       notificationType: 'like-post'
     })
@@ -150,22 +150,22 @@ router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
 router.route('/comments/add/:commentId').post(ensureAuthenticated, async(req, res) => {
   try {
     await Like.findOne({
-      userId: req.user._id,
+      userId: req.session.user._id,
       commentId: req.params.commentId,
       likeType: 'comment'
     })
       .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (liked === null) return res.status(400).json(`User ${req.user.userName} is already liked this comment`);
+        else if (liked === null) return res.status(400).json(`User ${req.session.user.userName} is already liked this comment`);
         else {
           await Comment.findById(req.params.commentId)
             .exec(async(err, comment) => {
               if (err) return res.status(400).json('Error: ' + err);
               else if (comment === null) return res.status(400).json('Internal error');
               else {
-                const userName = req.user.userName;
+                const userName = req.session.user.userName;
                 const postId = comment.postId;
-                const userId = req.user._id;
+                const userId = req.session.user._id;
                 const commentId = comment._id;
                 const likeType = 'comment';
 
@@ -184,8 +184,8 @@ router.route('/comments/add/:commentId').post(ensureAuthenticated, async(req, re
 
                 await comment.save();
 
-                const senderId = req.user._id;
-                const senderName = req.user.userName;
+                const senderId = req.session.user._id;
+                const senderName = req.session.user.userName;
                 const receiverId = comment.userId;
                 const receiverName = comment.userName;
                 const notificationType = 'like-comment';
@@ -210,7 +210,7 @@ router.route('/comments/add/:commentId').post(ensureAuthenticated, async(req, re
         }
       });
 
-    res.json(`Liked by ${req.user.userName}`);
+    res.json(`Liked by ${req.session.user.userName}`);
   }
   catch (err) {
     res.status(400).json('Error: ' + err);
@@ -221,13 +221,13 @@ router.route('/comments/add/:commentId').post(ensureAuthenticated, async(req, re
 router.route('/comments/:commentId').delete(ensureAuthenticated, async(req, res) => {
   try {
     await Like.findOneAndDelete({
-      userId: req.user._id,
+      userId: req.session.user._id,
       commentId: req.params.commentId,
       likeType: 'comment'
     })
       .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (liked === null) return res.status(400).json(`User ${req.user.userName} not liked this comment yet`);
+        else if (liked === null) return res.status(400).json(`User ${req.session.user.userName} not liked this comment yet`);
         else {
           await Comment.findById(req.params.commentId)
             .exec((err, comment) => {
@@ -251,7 +251,7 @@ router.route('/comments/:commentId').delete(ensureAuthenticated, async(req, res)
       });
     await Notification.findOneAndDelete({
       commentId: req.params.commentId,
-      senderId: req.user._id,
+      senderId: req.session.user._id,
       notificationType: 'like-comment'
     })
       .exec((err, notification) => {

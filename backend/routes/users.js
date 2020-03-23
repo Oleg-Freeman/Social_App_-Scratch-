@@ -3,7 +3,6 @@ const User = require('../models/user.model');
 const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
 const bcrypt = require('bcrypt');
-const passport = require('passport');
 // Image upload
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
@@ -12,8 +11,8 @@ const {
   registerValidation,
   ensureAuthenticated,
   loginValidation,
-  // isloggedIn,
-  // forwardAuthenticated,
+  isloggedIn,
+  isNotloggedIn,
   userDetailsValidation
 } = require('../middlewares/validation');
 
@@ -45,6 +44,7 @@ const upload = multer({ storage: storage, fileFilter: imageFilter });
 router.route('/').get(async(req, res) => {
   try {
     await User.find()
+      .select('-password -__v')
       .sort({ createdAt: -1 })
       .populate({
         path: 'posts',
@@ -67,7 +67,7 @@ router.route('/').get(async(req, res) => {
 });
 
 // Register new user
-router.route('/register').post(async(req, res) => {
+router.route('/register').post(isloggedIn, async(req, res) => {
   // eslint-disable-next-line no-unused-vars
   const { email, password, password2, userName } = req.body;
 
@@ -118,12 +118,7 @@ router.route('/register').post(async(req, res) => {
 });
 
 // Login
-router.route('/login').post(async(req, res, next) => {
-  // if (req.user) {
-  //   console.log('User already logged in');
-  //   return res.json('User already logged in');
-  // }
-
+router.route('/login').post(isloggedIn, async(req, res) => {
   const { error } = loginValidation(req.body);
   if (error && error.details[0].path[0] === 'email') {
     return res.status(400).json({
@@ -138,28 +133,28 @@ router.route('/login').post(async(req, res, next) => {
     });
   }
   try {
-    await passport.authenticate('local', {
-      // successRedirect: '/posts'
-      // failureRedirect: '/users/login'
-    // failureFlash: true
-    }, (err, user, info) => {
-      if (err) {
-        return res.status(400).json(err);
-      }
-      if (!user) {
-        return res.status(400).json(info);
-      }
-      req.logIn(user, function(err) {
-        if (err) {
-          return res.status(400).json(err);
-        }
-        user.isAuthenticated = true;
-        // console.log(req.cookies);
+    await User.findOne({ email: req.body.email })
+      .exec((err, user) => {
+        if (err) return res.status(400).json('Error: ' + err);
+        if (user === null || user.length === 0) return res.status(400).json('Wrong credentials, try again');
 
-        // return res.redirect('/posts');
-        return res.json(user);
+        // Match password
+        bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
+          if (err) {
+            console.log(err);
+            return res.status(400).json('Error: ' + err);
+          }
+          if (isMatch) {
+            req.session.user = user;
+            req.session.user.password = undefined;
+
+            res.json(user._id);
+          }
+          else {
+            return res.status(400).json('Wrong credentials, try again');
+          }
+        });
       });
-    })(req, res, next);
   }
   catch (err) {
     console.log(err);
@@ -167,16 +162,23 @@ router.route('/login').post(async(req, res, next) => {
 });
 
 // Logout
-router.route('/logout').get((req, res) => {
-  req.logout();
-  // res.redirect('/users/login');
-  res.json('Logged out');
+router.route('/logout').get(isNotloggedIn, async(req, res) => {
+  await req.session.destroy(err => {
+    if (err) {
+      console.log(err);
+      return res.status(400).json('Error: ' + err);
+    }
+    else {
+      return res.clearCookie('sId').json('Logged out');
+    }
+  });
 });
 
 // Get one user by ID
 router.route('/:id').get(async(req, res) => {
   try {
     await User.findById(req.params.id)
+      .select('-password -__v')
       .populate({
         path: 'posts',
         populate: {
