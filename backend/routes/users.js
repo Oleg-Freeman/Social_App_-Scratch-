@@ -11,8 +11,6 @@ const {
   registerValidation,
   ensureAuthenticated,
   loginValidation,
-  isloggedIn,
-  isNotloggedIn,
   userDetailsValidation
 } = require('../middlewares/validation');
 
@@ -67,7 +65,7 @@ router.route('/').get(async(req, res) => {
 });
 
 // Register new user
-router.route('/register').post(isloggedIn, async(req, res) => {
+router.route('/register').post(async(req, res) => {
   // eslint-disable-next-line no-unused-vars
   const { email, password, password2, userName } = req.body;
 
@@ -118,7 +116,7 @@ router.route('/register').post(isloggedIn, async(req, res) => {
 });
 
 // Login
-router.route('/login').post(isloggedIn, async(req, res) => {
+router.route('/login').post(async(req, res) => {
   const { error } = loginValidation(req.body);
   if (error && error.details[0].path[0] === 'email') {
     return res.status(400).json({
@@ -136,24 +134,27 @@ router.route('/login').post(isloggedIn, async(req, res) => {
     await User.findOne({ email: req.body.email })
       .exec((err, user) => {
         if (err) return res.status(400).json('Error: ' + err);
-        if (user === null || user.length === 0) return res.status(400).json('Wrong credentials, try again');
-
+        else if (user === null || user.length === 0) return res.status(400).json('Wrong credentials, try again');
+        else if (user.isAuthenticated === true) return res.json({ authenticated: true });
+        else {
         // Match password
-        bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
-          if (err) {
-            console.log(err);
-            return res.status(400).json('Error: ' + err);
-          }
-          if (isMatch) {
-            req.session.user = user;
-            req.session.user.password = undefined;
+          bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
+            if (err) {
+              console.log(err);
+              return res.status(400).json('Error: ' + err);
+            }
+            if (isMatch) {
+              user.isAuthenticated = true;
 
-            res.json(user._id);
-          }
-          else {
-            return res.status(400).json('Wrong credentials, try again');
-          }
-        });
+              return user.save(() => {
+                res.json(user._id);
+              });
+            }
+            else {
+              return res.status(400).json('Wrong credentials, try again');
+            }
+          });
+        }
       });
   }
   catch (err) {
@@ -162,16 +163,19 @@ router.route('/login').post(isloggedIn, async(req, res) => {
 });
 
 // Logout
-router.route('/logout').get(isNotloggedIn, async(req, res) => {
-  await req.session.destroy(err => {
-    if (err) {
-      console.log(err);
-      return res.status(400).json('Error: ' + err);
-    }
-    else {
-      return res.clearCookie('sId').json('Logged out');
-    }
-  });
+router.route('/logout/:id').get(async(req, res) => {
+  await User.findOne({ _id: req.params.id })
+    .exec((err, user) => {
+      if (err) return res.status(400).json('Error: ' + err);
+      else if (user === null || user.length === 0) return res.status(400).json('User not found');
+      else if (user.isAuthenticated === false) return res.json({ notAuthenticated: true });
+      else {
+        user.isAuthenticated = false;
+        return user.save(() => {
+          res.json({ loggedOut: true });
+        });
+      }
+    });
 });
 
 // Get one user by ID

@@ -2,37 +2,12 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const connectDb = require('./db');
-const session = require('express-session');
-// const cookieSession = require('cookie-session');
-// const cookieParser = require('cookie-parser');
 
 require('dotenv').config({ path: './config/.env' });
 
 const port = process.env.PORT || 5000;
 const uriDb = process.env.ATLAS_URI;
 connectDb(uriDb);
-
-app.use(
-  session({
-    cookie: {
-      // maxAge: 1000 * 60 * 60 * 12, // 1000mS = 1 Second
-      sameSite: true,
-      expires: false
-    },
-    name: 'sId',
-    // path: '/*',
-    secret: process.env.SESSION_SECRET,
-    resave: false, // true
-    saveUninitialized: false // true
-  })
-);
-// app.use(cookieParser());
-// app.use(cookieSession({
-//   // maxAge: 60 * 60 * 1000,
-//   name: 'userSession',
-//   // path: '/',
-//   keys: [process.env.COOKIE_KEY]
-// }));
 
 app.use(cors());
 app.use(express.json());

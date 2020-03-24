@@ -40,7 +40,7 @@ module.exports = {
     res.redirect('/');
   },
 
-  isloggedIn: (req, res, next) => {
+  isloggedIn: async(req, res, next) => {
     if (req.session.user) {
       console.log('User already logged in');
       return res.json({ authenticated: true });
@@ -54,7 +54,7 @@ module.exports = {
     console.log(req.session.user);
     if (!req.session.user) {
       console.log('User not logged in');
-      return res.json({ authenticated: false });
+      return res.json({ notAuthenticated: true });
     }
     else {
       next();
