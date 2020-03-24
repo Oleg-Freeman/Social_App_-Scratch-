@@ -3,7 +3,8 @@ import {
   SET_ERRORS,
   CLEAR_ERRORS,
   LOADING_UI,
-  SET_UNAUTHENTICATED,
+  // SET_UNAUTHENTICATED,
+  // SET_AUTHENTICATED,
   LOADING_USER
   // MARK_NOTIFICATIONS_READ
 } from '../types';
@@ -14,20 +15,22 @@ export const loginUser = (userData, history) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   axios.post('http://localhost:5000/users/login', userData)
     .then(res => {
-      // console.log('Login Data');
-      // console.log(document.cookie);
-      // console.log(Cookies.getItem('user'));
-      // dispatch(getUserData());
-      // const isAuthenticated = res.data.isAuthenticated;
-      // const currentUser = res.data;
-      window.localStorage.setItem('currentUserId', JSON.stringify(res.data._id));
-      // console.log(currentUser);
-      dispatch({ type: CLEAR_ERRORS });
-      dispatch({
-        type: SET_USER,
-        payload: res.data
-      });
-      history.push('/');
+      if (res.data.authenticated) {
+        dispatch({ type: CLEAR_ERRORS });
+        // dispatch({ type: SET_AUTHENTICATED });
+        history.push('/');
+      }
+      else {
+        dispatch({ type: CLEAR_ERRORS });
+        window.localStorage.setItem('session_token', res.data); // JSON.stringify(res.data._id)
+        // console.log(currentUser);
+        // dispatch({ type: SET_AUTHENTICATED });
+        dispatch({
+          type: SET_USER,
+          payload: res.data
+        });
+        history.push('/');
+      }
     }).catch(err => {
       dispatch({
         type: SET_ERRORS,
@@ -55,12 +58,17 @@ export const registerUser = (newUserData, history) => (dispatch) => {
 
 export const logoutUser = (history) => (dispatch) => {
   axios.get('http://localhost:5000/users/logout')
-    .then(() => {
-      dispatch({ type: SET_UNAUTHENTICATED });
-      window.localStorage.removeItem('currentUserId');
-      // window.localStorage.clear();
-      // history.push('/');
-      console.log('Logged out');
+    .then(res => {
+      if (!res.data.authenticated) {
+        window.localStorage.removeItem('session_token');
+        history.push('/login');
+      }
+      else {
+      // dispatch({ type: SET_UNAUTHENTICATED });
+        window.localStorage.removeItem('session_token');
+        console.log('Logged out');
+        history.push('/');
+      }
     })
     .catch(err => {
       console.log(err);

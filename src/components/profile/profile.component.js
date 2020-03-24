@@ -81,7 +81,7 @@ class Profile extends Component {
 
   componentDidMount() {
     // console.log(this.props.history);
-    this.props.getUserData(window.localStorage.getItem('currentUserId'));
+    this.props.getUserData(window.localStorage.getItem('session_token'));
   }
 
   handleImageChange(event) {
@@ -112,12 +112,12 @@ class Profile extends Component {
         // authenticated
       }
     } = this.props;
-    const currentUserId = window.localStorage.getItem('currentUserId');
+    const isAuthenticated = window.localStorage.getItem('session_token');
     // console.log(currentUserId);
     // const isAuthenticated = Cookies.get('userSession');
 
     const profileMarkup = !loading ? (
-      currentUserId ? (
+      isAuthenticated ? (
         <Paper className={classes.paper}>
           <div className={classes.profile}>
             <div className="image-wrapper">
@@ -180,7 +180,7 @@ class Profile extends Component {
       ) : (
         <Paper className={classes.paper}>
           <Typography variant="body2" align="center">
-            No profile found, please login again
+            Please, LogIn to view Profile
           </Typography>
           <div className={classes.buttons}>
             <Button

@@ -67,6 +67,13 @@ class Register extends Component {
     };
   }
 
+  componentDidMount() {
+    // console.log(this.props.history);
+    if (window.localStorage.getItem('session_token')) {
+      this.props.history.push('/');
+    }
+  }
+
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.UI.errors) {
       this.setState({ errors: nextProps.UI.errors });
@@ -95,9 +102,9 @@ class Register extends Component {
     const { classes, UI: { loading } } = this.props;
     const { errors } = this.state;
 
-    const isAuthenticated = window.localStorage.getItem('isAuthenticated');
+    // const isAuthenticated = window.localStorage.getItem('isAuthenticated');
 
-    if (isAuthenticated) return this.props.history.push('/');
+    // if (isAuthenticated) return this.props.history.push('/');
 
     return (
       <Grid container className={classes.form}>

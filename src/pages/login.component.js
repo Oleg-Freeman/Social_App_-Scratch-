@@ -2,9 +2,9 @@
 import React, { Component } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import AppIcon from '../images/icon.png';
-import Cookies from 'js-cookie';
+// import Cookies from 'js-cookie';
 // import axios from 'axios';
 
 // MUI Stuff
@@ -65,6 +65,13 @@ class Login extends Component {
     };
   }
 
+  componentDidMount() {
+    // console.log(this.props.history);
+    if (window.localStorage.getItem('session_token')) {
+      this.props.history.push('/');
+    }
+  }
+
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.UI.errors) {
       this.setState({ errors: nextProps.UI.errors });
@@ -108,9 +115,9 @@ class Login extends Component {
     const { classes, UI: { loading } } = this.props;
     const { errors } = this.state;
     // const isAuthenticated = window.localStorage.getItem('isAuthenticated');
-    const isAuthenticated = Cookies.get('user');
+    // const isAuthenticated = Cookies.get('user');
     // console.log(isAuthenticated);
-    if (isAuthenticated) return <Redirect to='/'/>;
+    // if (isAuthenticated) return <Redirect to='/'/>;
     return (
       <Grid container className={classes.form}>
         <Grid item sm />

@@ -51,6 +51,7 @@ module.exports = {
   },
 
   isNotloggedIn: (req, res, next) => {
+    console.log(req.session.user);
     if (!req.session.user) {
       console.log('User not logged in');
       return res.json({ authenticated: false });

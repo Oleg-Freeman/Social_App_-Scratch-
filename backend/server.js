@@ -15,8 +15,9 @@ connectDb(uriDb);
 app.use(
   session({
     cookie: {
-      maxAge: 1000 * 60 * 60 * 12, // 1000mS = 1 Second
-      sameSite: true
+      // maxAge: 1000 * 60 * 60 * 12, // 1000mS = 1 Second
+      sameSite: true,
+      expires: false
     },
     name: 'sId',
     // path: '/*',

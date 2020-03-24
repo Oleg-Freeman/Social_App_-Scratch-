@@ -177,6 +177,7 @@ router.route('/logout').get(isNotloggedIn, async(req, res) => {
 // Get one user by ID
 router.route('/:id').get(async(req, res) => {
   try {
+    console.log(req.session.user);
     await User.findById(req.params.id)
       .select('-password -__v')
       .populate({
