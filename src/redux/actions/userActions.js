@@ -59,7 +59,7 @@ export const registerUser = (newUserData, history) => (dispatch) => {
 export const logoutUser = (history) => (dispatch) => {
   axios.get('http://localhost:5000/users/logout')
     .then(res => {
-      if (!res.data.authenticated) {
+      if (res.data.notAuthenticated) {
         window.localStorage.removeItem('session_token');
         history.push('/login');
       }
