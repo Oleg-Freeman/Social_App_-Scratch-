@@ -1,4 +1,5 @@
 const Joi = require('@hapi/joi');
+const User = require('../models/user.model');
 
 module.exports = {
 
@@ -20,30 +21,43 @@ module.exports = {
     return schema.validate(data);
   },
 
-  ensureAuthenticated: (req, res, next) => {
-    console.log('user', req.user);
-    console.log('headers', req.headers);
-    if (req.isAuthenticated()) {
-      if (req.body) {
-        return next();
-      }
+  ensureAuthenticated: async(req, res, next) => {
+    if (!req.headers.token) {
+      console.log('Please log in to view that resource');
+      return res.status(400).json('Please log in to view that resource');
     }
-    console.log('Please log in to view that resource');
-    // return res.redirect('/users/login');
-    return res.status(400).json('Please log in to view that resource');
-  },
-
-  forwardAuthenticated: (req, res, next) => {
-    if (!req.isAuthenticated()) {
-      return next();
+    else {
+      await User.findById(req.headers.token)
+        .exec((err, user) => {
+          if (err) return res.status(400).json('Error: ' + err);
+          else if (user === null || user.length === 0) {
+            return res.status(400).json('User not found');
+          }
+          else if (!user.isAuthenticated) {
+            console.log('Please log in to view that resource');
+            return res.status(400).json('Please log in to view that resource');
+          }
+          else {
+            next();
+          }
+        });
     }
-    res.redirect('/');
   },
 
   isloggedIn: async(req, res, next) => {
-    if (req.session.user) {
-      console.log('User already logged in');
-      return res.json({ authenticated: true });
+    // console.log(req.headers.token);
+    if (req.headers.token) {
+      await User.findById(req.headers.token)
+        .exec((err, user) => {
+          if (err) return res.status(400).json('Error: ' + err);
+          if (user.isAuthenticated) {
+            console.log('User already logged in');
+            return res.json({ authenticated: true });
+          }
+          else {
+            next();
+          }
+        });
     }
     else {
       next();

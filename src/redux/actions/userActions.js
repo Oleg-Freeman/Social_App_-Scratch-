@@ -22,7 +22,7 @@ export const loginUser = (userData, history) => (dispatch) => {
       }
       else {
         dispatch({ type: CLEAR_ERRORS });
-        window.localStorage.setItem('session_token', res.data); // JSON.stringify(res.data._id)
+        window.localStorage.setItem('token', res.data); // JSON.stringify(res.data._id)
         // console.log(currentUser);
         // dispatch({ type: SET_AUTHENTICATED });
         dispatch({
@@ -56,18 +56,22 @@ export const registerUser = (newUserData, history) => (dispatch) => {
     });
 };
 
-export const logoutUser = (history) => (dispatch) => {
-  axios.get('http://localhost:5000/users/logout')
+export const logoutUser = (history) => () => {
+  // console.log('token', token);
+  const token = window.localStorage.getItem('token');
+  axios.get(`http://localhost:5000/users/logout/${token.replace(/['"]+/g, '')}`)
     .then(res => {
+      console.log(res.data);
       if (res.data.notAuthenticated) {
-        window.localStorage.removeItem('session_token');
+        window.localStorage.removeItem('token');
         history.push('/login');
       }
-      else {
+      if (res.data.loggedOut) {
       // dispatch({ type: SET_UNAUTHENTICATED });
-        window.localStorage.removeItem('session_token');
+        window.localStorage.removeItem('token');
         console.log('Logged out');
-        history.push('/');
+        // history.push('/');
+        window.location.reload();
       }
     })
     .catch(err => {
@@ -97,18 +101,18 @@ export const getUserData = (userId) => (dispatch) => {
   }
 };
 
-export const uploadImage = (formData) => (dispatch, getState) => {
+export const uploadImage = (formData) => (dispatch) => {
   dispatch({ type: LOADING_USER });
-  const state = getState();
-  console.log('state', state.user.user);
+  const token = window.localStorage.getItem('token');
   axios({
     method: 'post',
     url: 'http://localhost:5000/users/image',
-    data: 'Hello',
-    headers: { user: 'userId' }
+    data: formData,
+    headers: { token: token.replace(/['"]+/g, '') }
   })
     .then(() => {
-      dispatch(getUserData());
+      // dispatch(getUserData());
+      window.location.reload();
     })
     .catch((err) => console.log(err));
 };

@@ -3,6 +3,7 @@ const Pusher = require('pusher');
 const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
 const Notification = require('../models/notification.model');
+const User = require('../models/user.model');
 const { ensureAuthenticated, bodyValidation } = require('../middlewares/validation');
 
 require('dotenv').config({ path: './config/.env' });
@@ -54,58 +55,65 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
   if (error) return res.status(400).json(error.details[0].message);
   else {
     try {
-      await Post.findById(req.params.postId)
-        .exec(async(err, post) => {
+      const token = req.headers.token;
+      await User.findById(token)
+        .exec(async(err, user) => {
           if (err) return res.status(400).json('Error: ' + err);
-          else if (post === null) return res.status(400).json('Internal error');
+          else if (user === null) return res.status(400).json('Internal error');
           else {
-            const userName = req.session.user.userName;
-            const body = req.body.body;
-            const postId = req.params.postId;
-            const userId = req.session.user._id;
-            const imageURL = req.session.user.imageURL;
+            await Post.findById(req.params.postId)
+              .exec(async(err, post) => {
+                if (err) return res.status(400).json('Error: ' + err);
+                else if (post === null) return res.status(400).json('Internal error');
+                else {
+                  const userName = user.userName;
+                  const body = req.body.body;
+                  const postId = req.params.postId;
+                  const userId = user._id;
+                  const imageURL = user.imageURL;
 
-            const newComment = new Comment({
-              postId,
-              userId,
-              userName,
-              body,
-              imageURL
-            });
+                  const newComment = new Comment({
+                    postId,
+                    userId,
+                    userName,
+                    body,
+                    imageURL
+                  });
 
-            await newComment.save();
+                  await newComment.save();
 
-            post.comments.unshift(newComment._id);
-            post.commentCount = ++post.commentCount;
+                  post.comments.unshift(newComment._id);
+                  post.commentCount = ++post.commentCount;
 
-            await post.save();
+                  await post.save();
 
-            const senderId = req.session.user._id;
-            const senderName = req.session.user.userName;
-            const receiverId = post.userId;
-            const receiverName = post.userName;
-            const commentId = newComment._id;
-            const notificationType = 'new-comment';
+                  const senderId = user._id;
+                  const senderName = user.userName;
+                  const receiverId = post.userId;
+                  const receiverName = post.userName;
+                  const commentId = newComment._id;
+                  const notificationType = 'new-comment';
 
-            const newNotification = new Notification({
-              senderId,
-              senderName,
-              receiverId,
-              receiverName,
-              postId,
-              commentId,
-              notificationType
-            });
+                  const newNotification = new Notification({
+                    senderId,
+                    senderName,
+                    receiverId,
+                    receiverName,
+                    postId,
+                    commentId,
+                    notificationType
+                  });
 
-            await newNotification.save(() => {
-              pusher.trigger('Twitter', 'new-comment', {
-                // message: 'hello world'
+                  await newNotification.save(() => {
+                    pusher.trigger('Twitter', 'new-comment', {
+                    // message: 'hello world'
+                    });
+                    res.json('Comment added!');
+                  });
+                }
               });
-            });
           }
         });
-
-      res.json('Comment added!');
     }
     catch (err) {
       res.status(400).json('Error: ' + err);
@@ -116,6 +124,7 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
 // Delete comment
 router.route('/:commentId').delete(ensureAuthenticated, async(req, res) => {
   try {
+    const token = req.headers.token;
     await Comment.findByIdAndDelete(req.params.commentId)
       .exec(async(err, comment) => {
         if (err) return res.status(400).json('Error: ' + err);
@@ -142,7 +151,7 @@ router.route('/:commentId').delete(ensureAuthenticated, async(req, res) => {
 
     await Notification.findOneAndDelete({
       commentId: req.params.commentId,
-      senderId: req.session.user._id,
+      senderId: token,
       notificationType: 'new-comment'
     })
       .exec((err, notification) => {

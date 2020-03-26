@@ -29,6 +29,7 @@ class Home extends Component {
 
   render() {
     const { posts, loading } = this.props.data;
+    // console.log(loading);
     const recentScreamsMarkup = !loading ? (
       posts.map(post => <Post key={post._id} post={post}/>)
     ) : <p>Loading...</p>;

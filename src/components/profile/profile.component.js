@@ -81,7 +81,7 @@ class Profile extends Component {
 
   componentDidMount() {
     // console.log(this.props.history);
-    this.props.getUserData(window.localStorage.getItem('session_token'));
+    this.props.getUserData(window.localStorage.getItem('token'));
   }
 
   handleImageChange(event) {
@@ -89,7 +89,7 @@ class Profile extends Component {
     const formData = new FormData();
     formData.append('image', image, image.name);
     this.props.uploadImage(formData);
-    console.log(formData);
+    // console.log(formData);
   };
 
   handleEditPicture() {
@@ -100,7 +100,7 @@ class Profile extends Component {
   handleLogout() {
     this.props.logoutUser(this.props.history);
     // this.props.history.push('/');
-    window.location.reload();
+    // window.location.reload();
   };
 
   render() {
@@ -112,7 +112,7 @@ class Profile extends Component {
         // authenticated
       }
     } = this.props;
-    const isAuthenticated = window.localStorage.getItem('session_token');
+    const isAuthenticated = window.localStorage.getItem('token');
     // console.log(currentUserId);
     // const isAuthenticated = Cookies.get('userSession');
 

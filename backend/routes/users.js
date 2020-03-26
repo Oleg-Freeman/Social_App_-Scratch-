@@ -11,7 +11,8 @@ const {
   registerValidation,
   ensureAuthenticated,
   loginValidation,
-  userDetailsValidation
+  userDetailsValidation,
+  isloggedIn
 } = require('../middlewares/validation');
 
 require('dotenv').config({ path: './config/.env' });
@@ -44,15 +45,15 @@ router.route('/').get(async(req, res) => {
     await User.find()
       .select('-password -__v')
       .sort({ createdAt: -1 })
-      .populate({
-        path: 'posts',
-        populate: {
-          path: 'comments likes',
-          populate: {
-            path: 'likes'
-          }
-        }
-      })
+      // .populate({
+      //   path: 'posts',
+      //   populate: {
+      //     path: 'comments likes',
+      //     populate: {
+      //       path: 'likes'
+      //     }
+      //   }
+      // })
       .exec((err, users) => {
         if (err) return res.status(400).json('Error: ' + err);
         else if (users === null || users.length === 0) return res.status(400).json('No any registered users found');
@@ -65,7 +66,7 @@ router.route('/').get(async(req, res) => {
 });
 
 // Register new user
-router.route('/register').post(async(req, res) => {
+router.route('/register').post(isloggedIn, async(req, res) => {
   // eslint-disable-next-line no-unused-vars
   const { email, password, password2, userName } = req.body;
 
@@ -116,7 +117,7 @@ router.route('/register').post(async(req, res) => {
 });
 
 // Login
-router.route('/login').post(async(req, res) => {
+router.route('/login').post(isloggedIn, async(req, res) => {
   const { error } = loginValidation(req.body);
   if (error && error.details[0].path[0] === 'email') {
     return res.status(400).json({
@@ -164,7 +165,7 @@ router.route('/login').post(async(req, res) => {
 
 // Logout
 router.route('/logout/:id').get(async(req, res) => {
-  await User.findOne({ _id: req.params.id })
+  await User.findById(req.params.id)
     .exec((err, user) => {
       if (err) return res.status(400).json('Error: ' + err);
       else if (user === null || user.length === 0) return res.status(400).json('User not found');
@@ -220,29 +221,32 @@ router.route('/:id').delete(ensureAuthenticated, (req, res) => {
 });
 
 // upload user profie image avatar
-router.route('/image').post(ensureAuthenticated, upload.single('image'), async(req, res) => {
+router.route('/image').post(ensureAuthenticated, upload.single('image'), async(req, res) => { // ensureAuthenticated,
   try {
+    const token = req.headers.token;
+    // console.log(token);
     await cloudinary.uploader.upload(req.file.path, async(error, result) => {
       // console.log(req);
       if (error) {
         return res.status(400).json('Error in image upload - ' + error);
       }
       else {
-        await User.findOneAndUpdate({ _id: req.user._id }, { imageURL: result.secure_url });
+        await User.findOneAndUpdate({ _id: token }, { imageURL: result.secure_url });
         // .exec((err, user) => {
         //   if (err) return res.status(400).json('Error: ' + err);
         //   if (user === null) return res.status(400).json('User Not found');
         // });
-        await Post.updateMany({ userId: req.user._id }, { imageURL: result.secure_url });
+        await Post.updateMany({ userId: token }, { imageURL: result.secure_url });
         // .exec((err, posts) => {
         //   if (err) return res.status(400).json('Error: ' + err);
         //   if (posts.nModified === 0) return res.status(400).json('Post Not found');
         // });
-        await Comment.updateMany({ userId: req.user._id }, { imageURL: result.secure_url });
+        await Comment.updateMany({ userId: token }, { imageURL: result.secure_url });
         // .exec((err, comments) => {
         //   if (err) return res.status(400).json('Error: ' + err);
         //   if (comments.nModified === 0) return res.status(400).json('Comments Not found');
         // });
+        return res.json('Image uploaded');
       }
     });
   }

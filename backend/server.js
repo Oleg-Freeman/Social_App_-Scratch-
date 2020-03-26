@@ -1,17 +1,23 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const connectDb = require('./db');
 
+// .env config
 require('dotenv').config({ path: './config/.env' });
 
+// Connect DB
 const port = process.env.PORT || 5000;
 const uriDb = process.env.ATLAS_URI;
 connectDb(uriDb);
 
+// Middlewares
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
+// Routes
 const usersRouter = require('./routes/users');
 const postsRouter = require('./routes/posts');
 const commentsRouter = require('./routes/comments');

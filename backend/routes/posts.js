@@ -34,29 +34,30 @@ router.route('/add').post(ensureAuthenticated, async(req, res) => {
     const { error } = bodyValidation(req.body);
     if (error) return res.status(400).json(error.details[0].message);
     else {
-      // const postId = req.body.postId; // _id: new mongoose.Types.ObjectId().toHexString(),
-      const userName = req.session.user.userName;
-      const body = req.body.body;
-      const imageURL = req.session.user.imageURL;
-      const userId = req.session.user._id;
-
-      const newPost = new Post({
-        userName,
-        body,
-        imageURL,
-        userId
-      });
-
-      await newPost.save();
-      await User.findById(req.session.user._id)
-        .exec((err, user) => {
+      const token = req.headers.token;
+      await User.findById(token)
+        .exec(async(err, user) => {
           if (err) return res.status(400).json('Error: ' + err);
           else if (user === null) return res.status(400).json('Internal error');
           else {
+            const userName = user.userName;
+            const body = req.body.body;
+            const imageURL = user.imageURL;
+            const userId = user._id;
+
+            const newPost = new Post({
+              userName,
+              body,
+              imageURL,
+              userId
+            });
+
+            await newPost.save();
+
             user.posts.unshift(newPost._id);
             user.postCount = ++user.postCount;
 
-            return user.save(() => {
+            await user.save(() => {
               res.json('Post added!');
             });
           }

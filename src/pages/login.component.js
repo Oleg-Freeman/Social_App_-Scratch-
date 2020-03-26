@@ -67,7 +67,7 @@ class Login extends Component {
 
   componentDidMount() {
     // console.log(this.props.history);
-    if (window.localStorage.getItem('session_token')) {
+    if (window.localStorage.getItem('token')) {
       this.props.history.push('/');
     }
   }
