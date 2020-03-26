@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
-import MyButton from '../../util/MyButton';
+import MyButton from '../../util/myButton';
 // Redux stuff
 import { connect } from 'react-redux';
 import { editUserDetails } from '../../redux/actions/userActions';
@@ -16,7 +16,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import EditIcon from '@material-ui/icons/Edit';
 
 const styles = (theme) => ({
-  ...theme,
+  // ...theme,
   button: {
     float: 'right'
   }
@@ -26,19 +26,27 @@ class EditDetails extends Component {
   constructor() {
     super();
 
+    // this.mapUserDetailsToState = this.mapUserDetailsToState.bind(this);
+    this.handleOpen = this.handleOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+
     this.state = {
       bio: '',
       website: '',
       location: '',
+      birthDay: '',
       open: false
     };
   }
 
   mapUserDetailsToState(credentials) {
     this.setState({
-      bio: credentials.bio ? credentials.bio : '',
-      website: credentials.website ? credentials.website : '',
-      location: credentials.location ? credentials.location : ''
+      bio: credentials.bio ? credentials.bio : undefined,
+      website: credentials.website ? credentials.website : undefined,
+      location: credentials.location ? credentials.location : undefined,
+      birthDay: credentials.birthDay ? credentials.birthDay : undefined
     });
   };
 
@@ -66,8 +74,10 @@ class EditDetails extends Component {
     const userDetails = {
       bio: this.state.bio,
       website: this.state.website,
-      location: this.state.location
+      location: this.state.location,
+      birthDay: this.state.birthDay
     };
+    // console.log(userDetails);
     this.props.editUserDetails(userDetails);
     this.handleClose();
   };
@@ -119,6 +129,16 @@ class EditDetails extends Component {
                 tpye="text"
                 label="Location"
                 placeholder="Where you live"
+                className={classes.textField}
+                value={this.state.location}
+                onChange={this.handleChange}
+                fullWidth
+              />
+              <TextField
+                name="birthDay"
+                tpye="text"
+                label="Birthday"
+                placeholder="Your Birthday"
                 className={classes.textField}
                 value={this.state.location}
                 onChange={this.handleChange}

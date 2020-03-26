@@ -4,7 +4,7 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 // import Cookies from 'js-cookie';
-// import EditDetails from './EditDetails';
+import EditDetails from './EditDetails';
 import MyButton from '../../util/myButton';
 // import ProfileSkeleton from '../../util/profileSkeleton';
 
@@ -77,6 +77,10 @@ class Profile extends Component {
     this.handleLogout = this.handleLogout.bind(this);
     this.handleImageChange = this.handleImageChange.bind(this);
     this.handleEditPicture = this.handleEditPicture.bind(this);
+
+    this.state = {
+      birthDay: ''
+    };
   }
 
   componentDidMount() {
@@ -107,11 +111,18 @@ class Profile extends Component {
     const {
       classes,
       user: {
-        user: { _Id, userName, createdAt, imageURL, bio, website, location, birthDay },
+        credentials: { _Id, userName, createdAt, imageURL, bio, website, location, birthDay },
         loading
         // authenticated
       }
     } = this.props;
+
+    if (birthDay) {
+      this.setState({
+        birthDay: dayjs(Date.now()).diff(birthDay, 'year')
+      });
+    }
+
     const isAuthenticated = window.localStorage.getItem('token');
     // console.log(currentUserId);
     // const isAuthenticated = Cookies.get('userSession');
@@ -147,7 +158,7 @@ class Profile extends Component {
                 @{userName}
               </MuiLink>
               <hr />
-              {bio && <Typography variant="body2">{dayjs(Date.now()).diff(birthDay, 'year')} years old</Typography>}
+              {bio && <Typography variant="body2">{this.state.birthDay}</Typography>}
               <hr />
               <hr />
               {bio && <Typography variant="body2">{bio}</Typography>}
@@ -174,7 +185,7 @@ class Profile extends Component {
             <MyButton tip="Logout" onClick={this.handleLogout}>
               <KeyboardReturn color="primary" />
             </MyButton>
-            {/* <EditDetails /> */}
+            <EditDetails />
           </div>
         </Paper>
       ) : (
