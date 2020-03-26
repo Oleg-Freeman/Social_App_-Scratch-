@@ -1,5 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import withStyles from '@material-ui/core/styles/withStyles';
 import MyButton from '../../util/myButton';
 // Redux stuff
@@ -31,12 +33,13 @@ class EditDetails extends Component {
     this.handleClose = this.handleClose.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.onChangeDate = this.onChangeDate.bind(this);
 
     this.state = {
       bio: '',
       website: '',
       location: '',
-      birthDay: '',
+      birthDay: new Date(),
       open: false
     };
   }
@@ -69,6 +72,12 @@ class EditDetails extends Component {
       [event.target.name]: event.target.value
     });
   };
+
+  onChangeDate(birthDay) {
+    this.setState({
+      birthDay: birthDay
+    });
+  }
 
   handleSubmit() {
     const userDetails = {
@@ -134,16 +143,13 @@ class EditDetails extends Component {
                 onChange={this.handleChange}
                 fullWidth
               />
-              <TextField
-                name="birthDay"
-                tpye="text"
-                label="Birthday"
-                placeholder="Your Birthday"
-                className={classes.textField}
-                value={this.state.location}
-                onChange={this.handleChange}
-                fullWidth
-              />
+              <div>
+                <label>Birthday: </label>
+                <DatePicker
+                  selected={Date.parse(this.state.birthDay)}
+                  onChange={this.onChangeDate}
+                />
+              </div>
             </form>
           </DialogContent>
           <DialogActions>

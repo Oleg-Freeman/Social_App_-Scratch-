@@ -86,6 +86,7 @@ export const getUserData = (userId) => (dispatch) => {
     axios
       .get(`http://localhost:5000/users/${userId.replace(/['"]+/g, '')}`)
       .then((res) => {
+        // console.log('user', res.data);
         dispatch({
           type: SET_USER,
           payload: res.data
@@ -111,8 +112,8 @@ export const uploadImage = (formData) => (dispatch) => {
     headers: { token: token.replace(/['"]+/g, '') }
   })
     .then(() => {
-      // dispatch(getUserData());
-      window.location.reload();
+      dispatch(getUserData(token));
+      // window.location.reload();
     })
     .catch((err) => console.log(err));
 };

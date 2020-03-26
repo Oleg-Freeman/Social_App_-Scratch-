@@ -77,10 +77,6 @@ class Profile extends Component {
     this.handleLogout = this.handleLogout.bind(this);
     this.handleImageChange = this.handleImageChange.bind(this);
     this.handleEditPicture = this.handleEditPicture.bind(this);
-
-    this.state = {
-      birthDay: ''
-    };
   }
 
   componentDidMount() {
@@ -90,7 +86,7 @@ class Profile extends Component {
 
   handleImageChange(event) {
     const image = event.target.files[0];
-    const formData = new FormData();
+    const formData = new window.FormData();
     formData.append('image', image, image.name);
     this.props.uploadImage(formData);
     // console.log(formData);
@@ -117,15 +113,18 @@ class Profile extends Component {
       }
     } = this.props;
 
+    let birthDayField = '';
+    // console.log(birthDay);
+
     if (birthDay) {
-      this.setState({
-        birthDay: dayjs(Date.now()).diff(birthDay, 'year')
-      });
+      birthDayField = dayjs(Date.now()).diff(birthDay, 'year') + ' yeras old';
+      // birthDay: Date.now()
+    }
+    else {
+      birthDayField = '';
     }
 
     const isAuthenticated = window.localStorage.getItem('token');
-    // console.log(currentUserId);
-    // const isAuthenticated = Cookies.get('userSession');
 
     const profileMarkup = !loading ? (
       isAuthenticated ? (
@@ -158,7 +157,7 @@ class Profile extends Component {
                 @{userName}
               </MuiLink>
               <hr />
-              {bio && <Typography variant="body2">{this.state.birthDay}</Typography>}
+              {bio && <Typography variant="body2">{birthDayField}</Typography>}
               <hr />
               <hr />
               {bio && <Typography variant="body2">{bio}</Typography>}
