@@ -27,7 +27,7 @@ const styles = {
     marginBottom: 20
   },
   image: {
-    minWidth: 100
+    minWidth: 150
   },
   content: {
     padding: 25,

@@ -127,6 +127,13 @@ export const editUserDetails = (userDetails) => (dispatch) => {
     data: userDetails,
     headers: { token: userId.replace(/['"]+/g, '') }
   })
+    .then(res => {
+      dispatch({
+        type: SET_USER,
+        payload: res.data
+      });
+      console.log('User detail updated');
+    })
     .catch((err) => console.log(err));
 };
 

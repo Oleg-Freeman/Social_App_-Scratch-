@@ -288,7 +288,7 @@ router.route('/update/:id').post(ensureAuthenticated, async(req, res) => {
             }
 
             await user.save(() => {
-              res.json('User updated!');
+              res.json(user);
             });
           }
         });

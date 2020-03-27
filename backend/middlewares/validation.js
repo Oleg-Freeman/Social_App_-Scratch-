@@ -92,7 +92,7 @@ module.exports = {
   userDetailsValidation: (data) => {
     const schema = Joi.object({
       bio: Joi.string().empty().not(' '),
-      website: Joi.string().uri().empty().not(' '),
+      website: Joi.string().empty().not(' '),
       location: Joi.string().empty().not(' '),
       birthDay: Joi.date().empty().less('now').iso().not(' ')
     });

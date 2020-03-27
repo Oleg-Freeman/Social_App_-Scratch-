@@ -157,9 +157,6 @@ class Profile extends Component {
                 @{userName}
               </MuiLink>
               <hr />
-              {bio && <Typography variant="body2">{birthDayField}</Typography>}
-              <hr />
-              <hr />
               {bio && <Typography variant="body2">{bio}</Typography>}
               <hr />
               {location && (
@@ -180,6 +177,9 @@ class Profile extends Component {
               )}
               <CalendarToday color="primary" />{' '}
               <span>Joined {dayjs(createdAt).format('MMM YYYY')}</span>
+              <hr />
+              {birthDayField && <Typography variant="body2">{birthDayField}</Typography>}
+              <hr />
             </div>
             <MyButton tip="Logout" onClick={this.handleLogout}>
               <KeyboardReturn color="primary" />
