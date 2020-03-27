@@ -131,7 +131,7 @@ router.route('/:commentId').delete(ensureAuthenticated, async(req, res) => {
         else if (comment === null) return res.status(400).json('Comments not found');
         else {
           await Post.findById(comment.postId)
-            .exec((err, post) => {
+            .exec(async(err, post) => {
               if (err) return res.status(400).json('Error: ' + err);
               else if (post === null) return res.status(400).json('Internal error');
               else {
@@ -142,7 +142,7 @@ router.route('/:commentId').delete(ensureAuthenticated, async(req, res) => {
                 else {
                   post.commentCount = --post.commentCount;
                   post.comments.splice(toDelete, 1);
-                  return post.save();
+                  await post.save();
                 }
               }
             });

@@ -3,8 +3,8 @@ import {
   SET_AUTHENTICATED,
   SET_UNAUTHENTICATED,
   LOADING_USER
-//   LIKE_POST,
-//   UNLIKE_POST,
+  // LIKE_POST,
+  // UNLIKE_POST
 //   MARK_NOTIFICATIONS_READ
 } from '../types';
 
@@ -12,7 +12,7 @@ const initialState = {
   authenticated: false,
   loading: false,
   credentials: {},
-  likes: [],
+  // likes: [],
   notifications: [],
   userId: ''
 };

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 // import Cookies from 'js-cookie';
 import EditDetails from './EditDetails';
-import MyButton from '../../util/myButton';
+import MyButton from '../../util/MyButton';
 // import ProfileSkeleton from '../../util/profileSkeleton';
 
 // MUI stuff

@@ -21,8 +21,7 @@ export const getPosts = () => (dispatch) => {
   axios
     .get('http://localhost:5000/posts')
     .then((res) => {
-      // console.log('retrived posts: ');
-      // console.log(res.data);
+      // console.log('retrived posts: ', res.data);
       dispatch({
         type: SET_POSTS,
         payload: res.data
@@ -36,6 +35,7 @@ export const getPosts = () => (dispatch) => {
       console.log(err);
     });
 };
+// TO DO - Get one post
 export const getPost = (postId) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   axios
@@ -49,7 +49,7 @@ export const getPost = (postId) => (dispatch) => {
     })
     .catch((err) => console.log(err));
 };
-  // Add post
+  // TO DO - Add post
 export const addPost = (newPost) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   axios
@@ -70,9 +70,15 @@ export const addPost = (newPost) => (dispatch) => {
 };
   // Like a post
 export const likePost = (postId) => (dispatch) => {
-  axios
-    .get(`/scream/${postId}/like`)
+  const token = window.localStorage.getItem('token');
+  axios({
+    method: 'get',
+    url: `http://localhost:5000/likes/add/${postId}`,
+    headers: { token: token.replace(/['"]+/g, '') }
+  })
     .then((res) => {
+      // console.log(res.data.newLikeId);
+      // dispatch(getPosts());
       dispatch({
         type: LIKE_POST,
         payload: res.data
@@ -82,12 +88,20 @@ export const likePost = (postId) => (dispatch) => {
 };
   // Unlike a post
 export const unlikePost = (postId) => (dispatch) => {
-  axios
-    .get(`/scream/${postId}/unlike`)
+  const token = window.localStorage.getItem('token');
+  axios({
+    method: 'delete',
+    url: `http://localhost:5000/likes/${postId}`,
+    headers: { token: token.replace(/['"]+/g, '') }
+  })
     .then((res) => {
+      // dispatch(getPosts());
       dispatch({
         type: UNLIKE_POST,
-        payload: res.data
+        payload: {
+          postId: postId,
+          unlikeId: res.data
+        }
       });
     })
     .catch((err) => console.log(err));

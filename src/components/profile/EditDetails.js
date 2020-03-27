@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import withStyles from '@material-ui/core/styles/withStyles';
-import MyButton from '../../util/myButton';
+import MyButton from '../../util/MyButton';
 // Redux stuff
 import { connect } from 'react-redux';
 import { editUserDetails } from '../../redux/actions/userActions';

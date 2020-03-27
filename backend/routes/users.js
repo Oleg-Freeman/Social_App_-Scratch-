@@ -133,13 +133,13 @@ router.route('/login').post(isloggedIn, async(req, res) => {
   }
   try {
     await User.findOne({ email: req.body.email })
-      .exec((err, user) => {
+      .exec(async(err, user) => {
         if (err) return res.status(400).json('Error: ' + err);
         else if (user === null || user.length === 0) return res.status(400).json('Wrong credentials, try again');
         else if (user.isAuthenticated === true) return res.json({ authenticated: true });
         else {
         // Match password
-          bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
+          await bcrypt.compare(req.body.password, user.password, async(err, isMatch) => {
             if (err) {
               console.log(err);
               return res.status(400).json('Error: ' + err);
@@ -147,7 +147,7 @@ router.route('/login').post(isloggedIn, async(req, res) => {
             if (isMatch) {
               user.isAuthenticated = true;
 
-              return user.save(() => {
+              await user.save(() => {
                 res.json(user._id);
               });
             }
@@ -165,18 +165,23 @@ router.route('/login').post(isloggedIn, async(req, res) => {
 
 // Logout
 router.route('/logout/:id').get(async(req, res) => {
-  await User.findById(req.params.id)
-    .exec((err, user) => {
-      if (err) return res.status(400).json('Error: ' + err);
-      else if (user === null || user.length === 0) return res.status(400).json('User not found');
-      else if (user.isAuthenticated === false) return res.json({ notAuthenticated: true });
-      else {
-        user.isAuthenticated = false;
-        return user.save(() => {
-          res.json({ loggedOut: true });
-        });
-      }
-    });
+  try {
+    await User.findById(req.params.id)
+      .exec(async(err, user) => {
+        if (err) return res.status(400).json('Error: ' + err);
+        else if (user === null || user.length === 0) return res.status(400).json('User not found');
+        else if (user.isAuthenticated === false) return res.json({ notAuthenticated: true });
+        else {
+          user.isAuthenticated = false;
+          await user.save(() => {
+            res.json({ loggedOut: true });
+          });
+        }
+      });
+  }
+  catch (err) {
+    console.log(err);
+  }
 });
 
 // Get one user by ID
@@ -262,7 +267,7 @@ router.route('/update/:id').post(ensureAuthenticated, async(req, res) => {
     if (error) return res.status(400).json(error.details[0].message);
     else {
       await User.findById(req.params.id)
-        .exec((err, user) => {
+        .exec(async(err, user) => {
           if (err) return res.status(400).json('Error: ' + err);
           else if (user === null) return res.status(400).json('User not found');
           else {
@@ -282,7 +287,7 @@ router.route('/update/:id').post(ensureAuthenticated, async(req, res) => {
               user.birthDay = req.body.birthDay;
             }
 
-            return user.save(() => {
+            await user.save(() => {
               res.json('User updated!');
             });
           }

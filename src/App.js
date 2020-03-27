@@ -12,7 +12,7 @@ import store from './redux/store';
 // import { logoutUser, getUserData } from './redux/actions/userActions';
 
 // Components
-import Navbar from './components/navbar.component';
+import Navbar from './components/layout/navbar.component';
 
 // Pages
 import Home from './pages/home.component';

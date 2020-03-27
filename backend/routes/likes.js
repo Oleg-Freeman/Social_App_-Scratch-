@@ -32,7 +32,7 @@ router.route('/').get(async(req, res) => {
 });
 
 // Like Post
-router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
+router.route('/add/:postId').get(ensureAuthenticated, async(req, res) => {
   try {
     const token = req.headers.token;
     await User.findById(token)
@@ -94,7 +94,9 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
                         pusher.trigger('Twitter', 'like-post', {
                           // message: 'hello world'
                         });
-                        res.json(`Liked by ${user.userName}`);
+                        // res.json(`Liked by ${user.userName}`);
+                        // res.json({ newLikeId: newLike._id });
+                        res.json(newLike);
                       });
                     }
                   });
@@ -119,10 +121,10 @@ router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
     })
       .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (liked !== null) return res.status(400).json('This post is not liked yet');
+        else if (liked === null) return res.status(400).json('This post is not liked yet');
         else {
           await Post.findById(req.params.postId)
-            .exec((err, post) => {
+            .exec(async(err, post) => {
               if (err) return res.status(400).json('Error: ' + err);
               else if (post === null) return res.status(400).json('Internal error');
               else {
@@ -135,13 +137,15 @@ router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
                   post.likeCount = --post.likeCount;
                   post.likes.splice(toDelete, 1);
 
-                  return post.save();
+                  return post.save(err => {
+                    if (err) console.log(err);
+                    res.json(liked._id);
+                  });
                 }
               }
             });
         }
       });
-
     await Notification.findOneAndDelete({
       senderId: token,
       postId: req.params.postId,
@@ -149,8 +153,8 @@ router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
     })
       .exec((err, notification) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (notification === null) return res.status(400).json('Internal error');
-        else return res.json('Unliked');
+        if (notification === null) return res.status(400).json('Internal error');
+        // else return res.json('Unliked');
       });
   }
   catch (err) {
@@ -159,7 +163,7 @@ router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
 });
 
 // Like comment
-router.route('/comments/add/:commentId').post(ensureAuthenticated, async(req, res) => {
+router.route('/comments/add/:commentId').get(ensureAuthenticated, async(req, res) => {
   try {
     const token = req.headers.token;
     await User.findById(token)
@@ -254,7 +258,7 @@ router.route('/comments/:commentId').delete(ensureAuthenticated, async(req, res)
         }
         else {
           await Comment.findById(req.params.commentId)
-            .exec((err, comment) => {
+            .exec(async(err, comment) => {
               if (err) return res.status(400).json('Error: ' + err);
               else if (comment === null) return res.status(400).json('Internal error');
               else {
@@ -267,7 +271,7 @@ router.route('/comments/:commentId').delete(ensureAuthenticated, async(req, res)
                   comment.likeCount = --comment.likeCount;
                   comment.likes.splice(toDelete, 1);
 
-                  return comment.save();
+                  await comment.save();
                 }
               }
             });

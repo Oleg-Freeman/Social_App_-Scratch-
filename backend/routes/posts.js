@@ -114,7 +114,7 @@ router.route('/:id').delete(ensureAuthenticated, async(req, res) => {
           //   if (notifications.nModified === 0) return res.status(400).json('Notifications Not found');
           // });
           await User.findById(post.userId)
-            .exec((err, user) => {
+            .exec(async(err, user) => {
               if (err) return res.status(400).json('Error: ' + err);
               else if (user === null) return res.status(400).json('Internal error');
               else {
@@ -125,7 +125,7 @@ router.route('/:id').delete(ensureAuthenticated, async(req, res) => {
                 else {
                   user.postCount = --user.postCount;
                   user.posts.splice(toDelete, 1);
-                  return user.save(() => {
+                  await user.save(() => {
                     res.json('Post deleted');
                   });
                 }
@@ -143,7 +143,7 @@ router.route('/:id').delete(ensureAuthenticated, async(req, res) => {
 router.route('/update/:id').post(ensureAuthenticated, async(req, res) => {
   try {
     await Post.findById(req.params.id)
-      .exec((err, post) => {
+      .exec(async(err, post) => {
         if (err) return res.status(400).json('Error: ' + err);
         else if (post === null) return res.status(400).json('Post not found');
         else {
@@ -153,7 +153,7 @@ router.route('/update/:id').post(ensureAuthenticated, async(req, res) => {
           // posts.postId = req.body.postId;// _id: new mongoose.Types.ObjectId().toHexString(),
           post.body = req.body.body;
 
-          return post.save(() => {
+          await post.save(() => {
             res.json('Post updated!');
           });
         }
