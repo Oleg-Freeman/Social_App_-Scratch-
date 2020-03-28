@@ -8,8 +8,8 @@ import {
   SET_POSTS,
   SUBMIT_COMMENT,
   LIKE_POST,
-  UNLIKE_POST
-//   DELETE_POST
+  UNLIKE_POST,
+  DELETE_POST
 } from '../types';
 
 const initialState = {
@@ -69,14 +69,15 @@ export default function(state = initialState, action) {
         ...state
       };
     }
-    // case DELETE_POST:
-    //   index = state.screams.findIndex(
-    //     (scream) => scream.screamId === action.payload
-    //   );
-    //   state.screams.splice(index, 1);
-    //   return {
-    //     ...state
-    //   };
+    case DELETE_POST: {
+      const index = state.posts.findIndex(
+        (post) => post._id === action.payload
+      );
+      state.posts.splice(index, 1);
+      return {
+        ...state
+      };
+    }
     case ADD_POST:
       return {
         ...state,

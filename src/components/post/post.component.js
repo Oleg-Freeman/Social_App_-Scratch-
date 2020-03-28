@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-// import MyButton from '../../util/MyButton';
-// import DeleteScream from './DeleteScream';
+import MyButton from '../../util/MyButton';
+import DeletePost from './DeletePost';
 // import ScreamDialog from './ScreamDialog';
 import LikeButton from './LikePostButton';
 
@@ -16,7 +16,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 
 // Icons
-// import ChatIcon from '@material-ui/icons/Chat';
+import ChatIcon from '@material-ui/icons/Chat';
 // Redux
 import { connect } from 'react-redux';
 
@@ -39,24 +39,10 @@ class Post extends Component {
   constructor() {
     super();
 
-    // this.refreshButton = this.refreshButton.bind(this);
-    // this.handleChange = this.handleChange.bind(this);
-
     this.state = {
       likeCount: 0
     };
   }
-
-  // refreshButton() {
-  //   this.setState({ likeCount: ++likeCount });
-  //   this.forceUpdate();
-  // }
-
-  // handleChange(event) {
-  //   this.setState({
-  //     [event.target.name]: event.target.value
-  //   });
-  // };
 
   render() {
     dayjs.extend(relativeTime);
@@ -69,11 +55,18 @@ class Post extends Component {
         createdAt,
         _id,
         likeCount,
-        // commentCount,
+        commentCount,
         userId
       }
     } = this.props;
-    // console.log(this.props.data.posts);
+    // const currentUserId = this.props.user.credentials._id;
+    const isAuthenticated = window.localStorage.getItem('token');
+    // console.log('post-userId', userId);
+    // console.log('localstorage-userId', isAuthenticated);
+
+    const deleteButton = isAuthenticated && isAuthenticated === userId ? (
+      <DeletePost postId={_id} />
+    ) : null;
     return (
       <Card className={classes.card}>
         <CardMedia
@@ -90,17 +83,17 @@ class Post extends Component {
           >
             {userName}
           </Typography>
-          {/* {deleteButton} */}
+          {deleteButton}
           <Typography variant="body2" color="textSecondary">
             {dayjs(createdAt).fromNow()}
           </Typography>
           <Typography variant="body1">{body}</Typography>
           <LikeButton postId={_id} />
           <span>{likeCount} Likes</span>
-          {/* <MyButton tip="comments">
+          <MyButton tip="comments">
             <ChatIcon color="primary" />
           </MyButton>
-          <span>{commentCount} comments</span> */}
+          <span>{commentCount} comments</span>
           {/* <ScreamDialog
             screamId={screamId}
             userHandle={userHandle}
@@ -116,7 +109,8 @@ Post.propTypes = {
   image: PropTypes.string,
   content: PropTypes.string,
   classes: PropTypes.object.isRequired,
-  post: PropTypes.object.isRequired
+  post: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) => ({

@@ -52,8 +52,13 @@ export const getPost = (postId) => (dispatch) => {
   // TO DO - Add post
 export const addPost = (newPost) => (dispatch) => {
   dispatch({ type: LOADING_UI });
-  axios
-    .post('/scream', newPost)
+  const token = window.localStorage.getItem('token');
+  axios({
+    method: 'post',
+    url: 'http://localhost:5000/posts/add/',
+    data: newPost,
+    headers: { token: token.replace(/['"]+/g, '') }
+  })
     .then((res) => {
       dispatch({
         type: ADD_POST,
@@ -62,6 +67,7 @@ export const addPost = (newPost) => (dispatch) => {
       dispatch(clearErrors());
     })
     .catch((err) => {
+      // console.log('Not valid body', err.response.data);
       dispatch({
         type: SET_ERRORS,
         payload: err.response.data
@@ -106,7 +112,7 @@ export const unlikePost = (postId) => (dispatch) => {
     })
     .catch((err) => console.log(err));
 };
-  // Submit a comment
+  // To Do - Submit a comment
 export const submitComment = (postId, commentData) => (dispatch) => {
   axios
     .post(`/scream/${postId}/comment`, commentData)
@@ -124,9 +130,14 @@ export const submitComment = (postId, commentData) => (dispatch) => {
       });
     });
 };
+// Delete post
 export const deletePost = (postId) => (dispatch) => {
-  axios
-    .delete(`/scream/${postId}`)
+  const token = window.localStorage.getItem('token');
+  axios({
+    method: 'delete',
+    url: `http://localhost:5000/posts/${postId}`,
+    headers: { token: token.replace(/['"]+/g, '') }
+  })
     .then(() => {
       dispatch({ type: DELETE_POST, payload: postId });
     })

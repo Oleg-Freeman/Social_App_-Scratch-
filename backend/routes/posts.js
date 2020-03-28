@@ -32,7 +32,7 @@ router.route('/').get(async(req, res) => {
 router.route('/add').post(ensureAuthenticated, async(req, res) => {
   try {
     const { error } = bodyValidation(req.body);
-    if (error) return res.status(400).json(error.details[0].message);
+    if (error) return res.status(400).json({ bodyValidationError: error.details[0].message });
     else {
       const token = req.headers.token;
       await User.findById(token)
@@ -58,7 +58,7 @@ router.route('/add').post(ensureAuthenticated, async(req, res) => {
             user.postCount = ++user.postCount;
 
             await user.save(() => {
-              res.json('Post added!');
+              res.json(newPost);
             });
           }
         });

@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import MyButton from '../../util/MyButton';
-// import NewPost from '../scream/PostScream';
+import NewPost from '../post/AddPost';
 
 // MUI stuff
 import AppBar from '@material-ui/core/AppBar';
@@ -19,7 +19,7 @@ export default class Navbar extends Component {
         <Toolbar className="nav-container">
           {isAuthenticated ? (
             <Fragment>
-              {/* <NewPost /> */}
+              <NewPost />
               <Link to="/">
                 <MyButton tip="Home">
                   <HomeIcon />

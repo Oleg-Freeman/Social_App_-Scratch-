@@ -25,6 +25,10 @@ class DeletePost extends Component {
   constructor() {
     super();
 
+    this.handleOpen = this.handleOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.deletePost = this.deletePost.bind(this);
+
     this.state = {
       open: false
     };

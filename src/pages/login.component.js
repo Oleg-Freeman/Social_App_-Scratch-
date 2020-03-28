@@ -85,24 +85,6 @@ class Login extends Component {
       password: this.state.password
     };
     this.props.loginUser(userData, this.props.history);
-
-    // axios.post('http://localhost:5000/users/login', userData)
-    //   .then(res => {
-    //     this.setState({
-    //       loading: false
-    //     });
-    //     this.props.history.push('/');
-    //   }).catch(err => {
-    //     this.setState({
-    //       errors: {
-    //         email: err.response.data.email,
-    //         password: err.response.data.password,
-    //         message: err.response.data.message
-    //       },
-    //       loading: false
-    //     });
-    //     console.log(err);
-    //   });
   };
 
   handleChange(event) {

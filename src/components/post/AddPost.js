@@ -14,10 +14,10 @@ import AddIcon from '@material-ui/icons/Add';
 import CloseIcon from '@material-ui/icons/Close';
 // Redux stuff
 import { connect } from 'react-redux';
-import { postPost, clearErrors } from '../../redux/actions/dataActions';
+import { addPost, clearErrors } from '../../redux/actions/dataActions';
 
 const styles = (theme) => ({
-  ...theme,
+  // ...theme,
   submitButton: {
     position: 'relative',
     float: 'right',
@@ -37,10 +37,17 @@ class AddPost extends Component {
   constructor() {
     super();
 
+    this.handleOpen = this.handleOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+
     this.state = {
       open: false,
       body: '',
-      errors: {}
+      errors: {
+        bodyValidationError: ''
+      }
     };
   }
 
@@ -70,7 +77,7 @@ class AddPost extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    this.props.postPost({ body: this.state.body });
+    this.props.addPost({ body: this.state.body });
   };
 
   render() {
@@ -103,12 +110,12 @@ class AddPost extends Component {
               <TextField
                 name="body"
                 type="text"
-                label="SCREAM!!"
+                label="Say something"
                 multiline
                 rows="3"
-                placeholder="Scream at your fellow apes"
-                error={!!errors.body}
-                helperText={errors.body}
+                placeholder="Say something to your buddies"
+                error={!!errors.bodyValidationError}
+                helperText={errors.bodyValidationError}
                 className={classes.textField}
                 onChange={this.handleChange}
                 fullWidth
@@ -137,7 +144,7 @@ class AddPost extends Component {
 }
 
 AddPost.propTypes = {
-  postPost: PropTypes.func.isRequired,
+  addPost: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
   UI: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired
@@ -149,5 +156,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
   mapStateToProps,
-  { postPost, clearErrors }
+  { addPost, clearErrors }
 )(withStyles(styles)(AddPost));
