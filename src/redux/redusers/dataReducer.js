@@ -6,10 +6,11 @@ import {
   //   DELETE_POSTS,
   ADD_POST,
   SET_POSTS,
-  SUBMIT_COMMENT,
+  ADD_COMMENT,
   LIKE_POST,
   UNLIKE_POST,
-  DELETE_POST
+  DELETE_POST,
+  DELETE_COMMENT
 } from '../types';
 
 const initialState = {
@@ -45,7 +46,11 @@ export default function(state = initialState, action) {
       );
       state.posts[index].likeCount = ++state.posts[index].likeCount;
       state.posts[index].likes.unshift(action.payload);
+
+      state.post.likeCount = ++state.post.likeCount;
+      state.post.likes.unshift(action.payload);
       // console.log('likes', state.posts[index].likes);
+      // console.log('like post', state.post);
       return {
         ...state
       };
@@ -58,13 +63,14 @@ export default function(state = initialState, action) {
       );
       // console.log('index?', index);
       state.posts[index].likeCount = --state.posts[index].likeCount;
+      state.post.likeCount = --state.post.likeCount;
       const unlikeIndex = state.posts[index].likes.findIndex(
         (like) => like._id === action.payload.unlikeId
       );
-      // console.log('unlikeIndex', unlikeIndex);
-      // console.log('unlikeId', action.payload.unlikeId);
       state.posts[index].likes.splice(unlikeIndex, 1);
+      state.post.likes.splice(unlikeIndex, 1);
       // console.log('likes', state.posts[index].likes);
+      // console.log('like post', state.post);
       return {
         ...state
       };
@@ -83,7 +89,12 @@ export default function(state = initialState, action) {
         ...state,
         posts: [action.payload, ...state.posts]
       };
-    case SUBMIT_COMMENT:
+    case ADD_COMMENT: {
+      const index = state.posts.findIndex(
+        (post) => post._id === action.payload.postId
+      );
+      state.posts[index].commentCount = ++state.posts[index].commentCount;
+      state.post.commentCount = ++state.post.commentCount;
       return {
         ...state,
         post: {
@@ -91,6 +102,24 @@ export default function(state = initialState, action) {
           comments: [action.payload, ...state.post.comments]
         }
       };
+    }
+    case DELETE_COMMENT: {
+      const postIndex = state.posts.findIndex(
+        (post) => post._id === action.payload.postId
+      );
+      // console.log('postIndex', postIndex);
+      const commentIndex = state.posts[postIndex].comments.findIndex(
+        (comment) => comment._id === action.payload.commentId
+      );
+      // console.log('commentIndex', commentIndex);
+      state.posts[postIndex].comments.splice(commentIndex, 1);
+      state.posts[postIndex].commentCount = --state.posts[postIndex].commentCount;
+      state.post.comments.splice(commentIndex, 1);
+      state.post.commentCount = --state.post.commentCount;
+      return {
+        ...state
+      };
+    }
     default:
       return state;
   }

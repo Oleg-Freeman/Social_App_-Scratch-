@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 // Redux stuff
 import { connect } from 'react-redux';
-import { submitComment } from '../../redux/actions/dataActions';
+import { addComment } from '../../redux/actions/dataActions';
 
 const styles = (theme) => ({
 //   ...theme
@@ -17,6 +17,9 @@ const styles = (theme) => ({
 class CommentForm extends Component {
   constructor() {
     super();
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
 
     this.state = {
       body: '',
@@ -39,20 +42,21 @@ class CommentForm extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    this.props.submitComment(this.props.postId, { body: this.state.body });
+    this.props.addComment(this.props.postId, { body: this.state.body });
   };
 
   render() {
-    const { classes, authenticated } = this.props;
+    const { classes } = this.props;
     const errors = this.state.errors;
+    const isAuthenticated = window.localStorage.getItem('token');
 
-    const commentFormMarkup = authenticated ? (
+    const commentFormMarkup = isAuthenticated ? (
       <Grid item sm={12} style={{ textAlign: 'center' }}>
         <form onSubmit={this.handleSubmit}>
           <TextField
             name="body"
             type="text"
-            label="Comment on post"
+            label="Add your comment"
             error={!!errors.comment}
             helperText={errors.comment}
             value={this.state.body}
@@ -77,19 +81,17 @@ class CommentForm extends Component {
 }
 
 CommentForm.propTypes = {
-  submitComment: PropTypes.func.isRequired,
+  addComment: PropTypes.func.isRequired,
   UI: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
-  postId: PropTypes.string.isRequired,
-  authenticated: PropTypes.bool.isRequired
+  postId: PropTypes.string.isRequired
 };
 
 const mapStateToProps = (state) => ({
-  UI: state.UI,
-  authenticated: state.user.authenticated
+  UI: state.UI
 });
 
 export default connect(
   mapStateToProps,
-  { submitComment }
+  { addComment }
 )(withStyles(styles)(CommentForm));

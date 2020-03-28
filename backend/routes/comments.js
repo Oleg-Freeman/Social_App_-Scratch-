@@ -108,7 +108,7 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
                     pusher.trigger('Twitter', 'new-comment', {
                     // message: 'hello world'
                     });
-                    res.json('Comment added!');
+                    res.json(newComment);
                   });
                 }
               });

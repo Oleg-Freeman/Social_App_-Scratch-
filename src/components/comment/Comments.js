@@ -3,17 +3,20 @@ import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
+import DeleteComment from './DeleteComment';
+import LikeButton from './LikeCommentButton';
 // MUI
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
 const styles = (theme) => ({
-  ...theme,
+  // ...theme,
   commentImage: {
     maxWidth: '100%',
     height: 100,
     objectFit: 'cover',
     borderRadius: '50%'
+    // marginLeft: 20
   },
   commentData: {
     marginLeft: 20
@@ -22,11 +25,13 @@ const styles = (theme) => ({
 
 class Comments extends Component {
   render() {
-    const { comments, classes } = this.props;
+    const isAuthenticated = window.localStorage.getItem('token');
+    const { comments, classes, postId, userId } = this.props;
+
     return (
       <Grid container>
         {comments.map((comment, index) => {
-          const { body, createdAt, userImage, userHandle } = comment;
+          const { body, createdAt, userImage, userName, _id } = comment;
           return (
             <Fragment key={createdAt}>
               <Grid item sm={12}>
@@ -43,16 +48,20 @@ class Comments extends Component {
                       <Typography
                         variant="h5"
                         component={Link}
-                        to={`/users/${userHandle}`}
+                        to={`/users/${userName}`}
                         color="primary"
                       >
-                        {userHandle}
+                        {userName}
                       </Typography>
+                      {isAuthenticated && isAuthenticated === userId ? (
+                        <DeleteComment postId={postId} commentId={_id} />
+                      ) : null}
                       <Typography variant="body2" color="textSecondary">
                         {dayjs(createdAt).format('h:mm a, MMMM DD YYYY')}
                       </Typography>
                       <hr className={classes.invisibleSeparator} />
                       <Typography variabnt="body1">{body}</Typography>
+
                     </div>
                   </Grid>
                 </Grid>
@@ -70,7 +79,9 @@ class Comments extends Component {
 
 Comments.propTypes = {
   comments: PropTypes.array.isRequired,
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  postId: PropTypes.string.isRequired,
+  userId: PropTypes.string.isRequired
 };
 
 export default withStyles(styles)(Comments);

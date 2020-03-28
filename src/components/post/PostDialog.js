@@ -2,9 +2,9 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
 import MyButton from '../../util/MyButton';
-import LikeButton from './LikeButton';
-import Comments from './Comments';
-import CommentForm from './CommentForm';
+import LikeButton from './LikePostButton';
+import Comments from '../comment/Comments';
+import AddComment from '../comment/AddComment';
 import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 // MUI Stuff
@@ -22,7 +22,7 @@ import { connect } from 'react-redux';
 import { getPost, clearErrors } from '../../redux/actions/dataActions';
 
 const styles = (theme) => ({
-  ...theme,
+  // ...theme,
   profileImage: {
     maxWidth: 200,
     height: 200,
@@ -30,7 +30,10 @@ const styles = (theme) => ({
     objectFit: 'cover'
   },
   dialogContent: {
-    padding: 20
+    padding: 20,
+    paddingLeft: 50,
+    paddingRight: 50,
+    marginBottom: 20
   },
   closeButton: {
     position: 'absolute',
@@ -51,6 +54,9 @@ class PostDialog extends Component {
   constructor() {
     super();
 
+    this.handleOpen = this.handleOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+
     this.state = {
       open: false,
       oldPath: '',
@@ -65,21 +71,24 @@ class PostDialog extends Component {
   }
 
   handleOpen() {
-    let oldPath = window.location.pathname;
+    // let oldPath = window.location.pathname;
 
-    const { userHandle, postId } = this.props;
-    const newPath = `/users/${userHandle}/post/${postId}`;
+    // const { userId, postId } = this.props;
+    // const newPath = `/users/${userId}/post/${postId}`;
 
-    if (oldPath === newPath) oldPath = `/users/${userHandle}`;
+    // if (oldPath === newPath) oldPath = `/users/${userId}`;
 
-    window.history.pushState(null, null, newPath);
+    // window.history.pushState(null, null, newPath);
 
-    this.setState({ open: true, oldPath, newPath });
+    // this.setState({ open: true, oldPath, newPath });
+    // this.props.getPost(this.props.postId);
+
+    this.setState({ open: true });
     this.props.getPost(this.props.postId);
   };
 
   handleClose() {
-    window.history.pushState(null, null, this.state.oldPath);
+    // window.history.pushState(null, null, this.state.oldPath);
     this.setState({ open: false });
     this.props.clearErrors();
   };
@@ -88,13 +97,14 @@ class PostDialog extends Component {
     const {
       classes,
       post: {
-        postId,
+        _id,
         body,
         createdAt,
         likeCount,
         commentCount,
         userImage,
-        userHandle,
+        userName,
+        userId,
         comments
       },
       UI: { loading }
@@ -105,7 +115,7 @@ class PostDialog extends Component {
         <CircularProgress size={200} thickness={2} />
       </div>
     ) : (
-      <Grid container spacing={16}>
+      <Grid container spacing={10}>
         <Grid item sm={5}>
           <img src={userImage} alt="Profile" className={classes.profileImage} />
         </Grid>
@@ -114,9 +124,9 @@ class PostDialog extends Component {
             component={Link}
             color="primary"
             variant="h5"
-            to={`/users/${userHandle}`}
+            to={`/users/${userName}`}
           >
-            @{userHandle}
+            @{userName}
           </Typography>
           <hr className={classes.invisibleSeparator} />
           <Typography variant="body2" color="textSecondary">
@@ -124,7 +134,7 @@ class PostDialog extends Component {
           </Typography>
           <hr className={classes.invisibleSeparator} />
           <Typography variant="body1">{body}</Typography>
-          <LikeButton postId={postId} />
+          <LikeButton postId={_id} />
           <span>{likeCount} likes</span>
           <MyButton tip="comments">
             <ChatIcon color="primary" />
@@ -132,8 +142,8 @@ class PostDialog extends Component {
           <span>{commentCount} comments</span>
         </Grid>
         <hr className={classes.visibleSeparator} />
-        <CommentForm postId={postId} />
-        <Comments comments={comments} />
+        <AddComment postId={_id} />
+        <Comments comments={comments} postId={_id} userId={userId} />
       </Grid>
     );
     return (
@@ -171,7 +181,7 @@ PostDialog.propTypes = {
   clearErrors: PropTypes.func.isRequired,
   getPost: PropTypes.func.isRequired,
   postId: PropTypes.string.isRequired,
-  userHandle: PropTypes.string.isRequired,
+  userId: PropTypes.string.isRequired,
   post: PropTypes.object.isRequired,
   UI: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired
@@ -179,7 +189,8 @@ PostDialog.propTypes = {
 
 const mapStateToProps = (state) => ({
   post: state.data.post,
-  UI: state.UI
+  UI: state.UI,
+  data: state.data
 });
 
 const mapActionsToProps = {

@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import MyButton from '../../util/MyButton';
 import DeletePost from './DeletePost';
-// import ScreamDialog from './ScreamDialog';
+import PostDialog from './PostDialog';
 import LikeButton from './LikePostButton';
 
 // MUI Stuff
@@ -94,11 +94,11 @@ class Post extends Component {
             <ChatIcon color="primary" />
           </MyButton>
           <span>{commentCount} comments</span>
-          {/* <ScreamDialog
-            screamId={screamId}
-            userHandle={userHandle}
+          <PostDialog
+            postId={_id}
+            userId={userId}
             openDialog={this.props.openDialog}
-          /> */}
+          />
         </CardContent>
       </Card>
     );

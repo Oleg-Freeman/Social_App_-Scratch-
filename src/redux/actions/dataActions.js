@@ -10,7 +10,8 @@ import {
   LOADING_UI,
   SET_POST,
   STOP_LOADING_UI,
-  SUBMIT_COMMENT
+  ADD_COMMENT,
+  DELETE_COMMENT
 } from '../types';
 import axios from 'axios';
 
@@ -35,11 +36,11 @@ export const getPosts = () => (dispatch) => {
       console.log(err);
     });
 };
-// TO DO - Get one post
+// Get one post
 export const getPost = (postId) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   axios
-    .get(`/scream/${postId}`)
+    .get(`http://localhost:5000/posts/${postId}`)
     .then((res) => {
       dispatch({
         type: SET_POST,
@@ -49,7 +50,7 @@ export const getPost = (postId) => (dispatch) => {
     })
     .catch((err) => console.log(err));
 };
-  // TO DO - Add post
+  // Add post
 export const addPost = (newPost) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   const token = window.localStorage.getItem('token');
@@ -83,7 +84,7 @@ export const likePost = (postId) => (dispatch) => {
     headers: { token: token.replace(/['"]+/g, '') }
   })
     .then((res) => {
-      // console.log(res.data.newLikeId);
+      // console.log('like post');
       // dispatch(getPosts());
       dispatch({
         type: LIKE_POST,
@@ -101,6 +102,7 @@ export const unlikePost = (postId) => (dispatch) => {
     headers: { token: token.replace(/['"]+/g, '') }
   })
     .then((res) => {
+      // console.log('Unlike post');
       // dispatch(getPosts());
       dispatch({
         type: UNLIKE_POST,
@@ -112,13 +114,18 @@ export const unlikePost = (postId) => (dispatch) => {
     })
     .catch((err) => console.log(err));
 };
-  // To Do - Submit a comment
-export const submitComment = (postId, commentData) => (dispatch) => {
-  axios
-    .post(`/scream/${postId}/comment`, commentData)
+  // Add comment
+export const addComment = (postId, commentData) => (dispatch) => {
+  const token = window.localStorage.getItem('token');
+  axios({
+    method: 'post',
+    url: `http://localhost:5000/comments/add/${postId}`,
+    data: commentData,
+    headers: { token: token.replace(/['"]+/g, '') }
+  })
     .then((res) => {
       dispatch({
-        type: SUBMIT_COMMENT,
+        type: ADD_COMMENT,
         payload: res.data
       });
       dispatch(clearErrors());
@@ -129,6 +136,25 @@ export const submitComment = (postId, commentData) => (dispatch) => {
         payload: err.response.data
       });
     });
+};
+// Delete comment
+export const deleteComment = (commentId, postId) => (dispatch) => {
+  const token = window.localStorage.getItem('token');
+  axios({
+    method: 'delete',
+    url: `http://localhost:5000/comments/${commentId}`,
+    headers: { token: token.replace(/['"]+/g, '') }
+  })
+    .then(() => {
+      dispatch({
+        type: DELETE_COMMENT,
+        payload: {
+          postId: postId,
+          commentId: commentId
+        }
+      });
+    })
+    .catch((err) => console.log(err));
 };
 // Delete post
 export const deletePost = (postId) => (dispatch) => {
