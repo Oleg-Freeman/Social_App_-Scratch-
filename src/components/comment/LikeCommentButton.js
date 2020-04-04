@@ -7,28 +7,29 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 // REdux
 import { connect } from 'react-redux';
-import { likePost, unlikePost } from '../../redux/actions/dataActions';
+import { likeComment, unlikeComment } from '../../redux/actions/dataActions';
 
 export class LikeCommentButton extends Component {
   constructor() {
     super();
 
-    this.likedPost = this.likedPost.bind(this);
-    this.likePost = this.likePost.bind(this);
-    this.unlikePost = this.unlikePost.bind(this);
+    this.likedComment = this.likedComment.bind(this);
+    this.likeComment = this.likeComment.bind(this);
+    this.unlikeComment = this.unlikeComment.bind(this);
 
     this.state = {
       liked: false
     };
   }
 
-  likedPost() {
-    // console.log(this.props.postId);
+  likedComment() {
+    // console.log('postId', this.props.postId);
     const userId = window.localStorage.getItem('token');
-    const post = this.props.data.posts.find(post => post._id === this.props.postId);
-    // console.log('liked', post.likes);
-    if (post.likes.length !== 0) {
-      if (post.likes.find((like) => like.userId === userId.replace(/['"]+/g, ''))) {
+    const pId = this.props.data.posts.findIndex(post => post._id === this.props.postId);
+    const comment = this.props.data.posts[pId].comments.find(comment => comment._id === this.props.commentId);
+    // console.log('comment', comment);
+    if (comment) {
+      if (comment.likes.find(like => like.userId === userId.replace(/['"]+/g, ''))) {
         // console.log(true);
         return true;
       }
@@ -43,12 +44,12 @@ export class LikeCommentButton extends Component {
     }
   };
 
-  likePost() {
-    this.props.likePost(this.props.postId);
+  likeComment() {
+    this.props.likeComment(this.props.commentId);
   };
 
-  unlikePost() {
-    this.props.unlikePost(this.props.postId);
+  unlikeComment() {
+    this.props.unlikeComment(this.props.commentId);
   };
 
   render() {
@@ -59,12 +60,12 @@ export class LikeCommentButton extends Component {
           <FavoriteBorder color="primary" />
         </MyButton>
       </Link>
-    ) : this.likedPost() ? (
-      <MyButton tip="Undo like" onClick={this.unlikePost}>
+    ) : this.likedComment() ? (
+      <MyButton tip="Undo like" onClick={this.unlikeComment}>
         <FavoriteIcon color="primary" />
       </MyButton>
     ) : (
-      <MyButton tip="Like" onClick={this.likePost}>
+      <MyButton tip="Like" onClick={this.likeComment}>
         <FavoriteBorder color="primary" />
       </MyButton>
     );
@@ -75,9 +76,10 @@ export class LikeCommentButton extends Component {
 LikeCommentButton.propTypes = {
   user: PropTypes.object.isRequired,
   data: PropTypes.object.isRequired,
+  commentId: PropTypes.string.isRequired,
   postId: PropTypes.string.isRequired,
-  likePost: PropTypes.func.isRequired,
-  unlikePost: PropTypes.func.isRequired
+  likeComment: PropTypes.func.isRequired,
+  unlikeComment: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
@@ -86,8 +88,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapActionsToProps = {
-  likePost,
-  unlikePost
+  likeComment,
+  unlikeComment
 };
 
 export default connect(

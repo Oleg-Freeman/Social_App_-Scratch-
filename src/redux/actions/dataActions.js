@@ -11,7 +11,9 @@ import {
   SET_POST,
   STOP_LOADING_UI,
   ADD_COMMENT,
-  DELETE_COMMENT
+  DELETE_COMMENT,
+  LIKE_COMMENT,
+  UNLIKE_COMMENT
 } from '../types';
 import axios from 'axios';
 
@@ -42,6 +44,7 @@ export const getPost = (postId) => (dispatch) => {
   axios
     .get(`http://localhost:5000/posts/${postId}`)
     .then((res) => {
+      // console.log(res.data);
       dispatch({
         type: SET_POST,
         payload: res.data
@@ -84,7 +87,7 @@ export const likePost = (postId) => (dispatch) => {
     headers: { token: token.replace(/['"]+/g, '') }
   })
     .then((res) => {
-      // console.log('like post');
+      // console.log('like post', res.data);
       // dispatch(getPosts());
       dispatch({
         type: LIKE_POST,
@@ -156,6 +159,42 @@ export const deleteComment = (commentId, postId) => (dispatch) => {
     })
     .catch((err) => console.log(err));
 };
+  // Like comment
+export const likeComment = (commentId) => (dispatch) => {
+  const token = window.localStorage.getItem('token');
+  axios({
+    method: 'get',
+    url: `http://localhost:5000/likes/comments/add/${commentId}`,
+    headers: { token: token.replace(/['"]+/g, '') }
+  })
+    .then((res) => {
+      // console.log('like post');
+      // dispatch(getPosts());
+      dispatch({
+        type: LIKE_COMMENT,
+        payload: res.data
+      });
+    })
+    .catch((err) => console.log(err));
+};
+// Unlike a post
+export const unlikeComment = (commentId) => (dispatch) => {
+  const token = window.localStorage.getItem('token');
+  axios({
+    method: 'delete',
+    url: `http://localhost:5000/likes/comments/${commentId}`,
+    headers: { token: token.replace(/['"]+/g, '') }
+  })
+    .then((res) => {
+      // console.log('Unlike post');
+      // dispatch(getPosts());
+      dispatch({
+        type: UNLIKE_COMMENT,
+        payload: res.data
+      });
+    })
+    .catch((err) => console.log(err));
+};
 // Delete post
 export const deletePost = (postId) => (dispatch) => {
   const token = window.localStorage.getItem('token');
@@ -170,14 +209,14 @@ export const deletePost = (postId) => (dispatch) => {
     .catch((err) => console.log(err));
 };
 
-export const getUserData = (userNeme) => (dispatch) => {
+export const getUserData = (userId) => (dispatch) => {
   dispatch({ type: LOADING_DATA });
   axios
-    .get(`/user/${userNeme}`)
+    .get(`http://localhost:5000/users/${userId.replace(/['"]+/g, '')}`)
     .then((res) => {
       dispatch({
         type: SET_POSTS,
-        payload: res.data.screams
+        payload: res.data.posts
       });
     })
     .catch(() => {

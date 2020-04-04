@@ -9,7 +9,7 @@ import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 import { connect } from 'react-redux';
 import { likePost, unlikePost } from '../../redux/actions/dataActions';
 
-export class LikeButton extends Component {
+export class LikePostButton extends Component {
   constructor() {
     super();
 
@@ -72,7 +72,7 @@ export class LikeButton extends Component {
   }
 }
 
-LikeButton.propTypes = {
+LikePostButton.propTypes = {
   user: PropTypes.object.isRequired,
   data: PropTypes.object.isRequired,
   postId: PropTypes.string.isRequired,
@@ -93,4 +93,4 @@ const mapActionsToProps = {
 export default connect(
   mapStateToProps,
   mapActionsToProps
-)(LikeButton);
+)(LikePostButton);

@@ -107,12 +107,13 @@ class Profile extends Component {
     const {
       classes,
       user: {
-        credentials: { _Id, userName, createdAt, imageURL, bio, website, location, birthDay },
+        credentials: { _id, userName, createdAt, imageURL, bio, website, location, birthDay },
         loading
         // authenticated
       }
     } = this.props;
 
+    // console.log('Id: ', _id);
     let birthDayField = '';
     // console.log(birthDay);
 
@@ -150,7 +151,7 @@ class Profile extends Component {
             <div className="profile-details">
               <MuiLink
                 component={Link}
-                to={`/users/${_Id}`}
+                to={`/users/${_id}`}
                 color="primary"
                 variant="h5"
               >

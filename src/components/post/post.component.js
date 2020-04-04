@@ -7,7 +7,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import MyButton from '../../util/MyButton';
 import DeletePost from './DeletePost';
 import PostDialog from './PostDialog';
-import LikeButton from './LikePostButton';
+import LikePostButton from './LikePostButton';
 
 // MUI Stuff
 import Card from '@material-ui/core/Card';
@@ -88,7 +88,7 @@ class Post extends Component {
             {dayjs(createdAt).fromNow()}
           </Typography>
           <Typography variant="body1">{body}</Typography>
-          <LikeButton postId={_id} />
+          <LikePostButton postId={_id} />
           <span>{likeCount} Likes</span>
           <MyButton tip="comments">
             <ChatIcon color="primary" />

@@ -18,6 +18,7 @@ import Navbar from './components/layout/navbar.component';
 import Home from './pages/home.component';
 import Register from './pages/register.component';
 import Login from './pages/login.component';
+import User from './pages/user.component';
 
 const theme = createMuiTheme(themeObject);
 
@@ -33,7 +34,7 @@ function App() {
               <Route path="/" exact component={Home} />
               <Route path="/register" exact component={Register} />
               <Route path="/login" exact component={Login} />
-              {/* <Route path="/user" component={CreateUser} /> */}
+              <Route path="/users/:userId" component={User} />
 
             </Switch>
           </div>

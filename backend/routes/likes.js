@@ -228,7 +228,8 @@ router.route('/comments/add/:commentId').get(ensureAuthenticated, async(req, res
                         pusher.trigger('Twitter', 'like-comment', {
                           // message: 'hello world'
                         });
-                        res.json(`Liked by ${user.userName}`);
+                        // res.json(`Liked by ${user.userName}`);
+                        res.json(newLike);
                       });
                     }
                   });
@@ -271,7 +272,9 @@ router.route('/comments/:commentId').delete(ensureAuthenticated, async(req, res)
                   comment.likeCount = --comment.likeCount;
                   comment.likes.splice(toDelete, 1);
 
-                  await comment.save();
+                  await comment.save(() => {
+                    res.json(liked);
+                  });
                 }
               }
             });
@@ -284,8 +287,8 @@ router.route('/comments/:commentId').delete(ensureAuthenticated, async(req, res)
     })
       .exec((err, notification) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (notification === null) return res.status(400).json('Internal error');
-        else return res.json('Unliked');
+        if (notification === null) return res.status(400).json('Internal error');
+        // else return res.json('Unliked');
       });
   }
   catch (err) {

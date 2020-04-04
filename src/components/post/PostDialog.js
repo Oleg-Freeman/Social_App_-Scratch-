@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
 import MyButton from '../../util/MyButton';
-import LikeButton from './LikePostButton';
+import LikePostButton from './LikePostButton';
 import Comments from '../comment/Comments';
 import AddComment from '../comment/AddComment';
 import dayjs from 'dayjs';
@@ -102,7 +102,7 @@ class PostDialog extends Component {
         createdAt,
         likeCount,
         commentCount,
-        userImage,
+        imageURL,
         userName,
         userId,
         comments
@@ -117,7 +117,7 @@ class PostDialog extends Component {
     ) : (
       <Grid container spacing={10}>
         <Grid item sm={5}>
-          <img src={userImage} alt="Profile" className={classes.profileImage} />
+          <img src={imageURL} alt="Profile" className={classes.profileImage} />
         </Grid>
         <Grid item sm={7}>
           <Typography
@@ -134,7 +134,7 @@ class PostDialog extends Component {
           </Typography>
           <hr className={classes.invisibleSeparator} />
           <Typography variant="body1">{body}</Typography>
-          <LikeButton postId={_id} />
+          <LikePostButton postId={_id} />
           <span>{likeCount} likes</span>
           <MyButton tip="comments">
             <ChatIcon color="primary" />
@@ -143,7 +143,7 @@ class PostDialog extends Component {
         </Grid>
         <hr className={classes.visibleSeparator} />
         <AddComment postId={_id} />
-        <Comments comments={comments} postId={_id} userId={userId} />
+        <Comments comments={comments} userId={userId} />
       </Grid>
     );
     return (

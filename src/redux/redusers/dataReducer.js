@@ -1,16 +1,15 @@
 import {
   SET_POST,
-  // LIKE_POST,
-  // UNLIKE_POST,
   LOADING_DATA,
-  //   DELETE_POSTS,
   ADD_POST,
   SET_POSTS,
   ADD_COMMENT,
   LIKE_POST,
   UNLIKE_POST,
   DELETE_POST,
-  DELETE_COMMENT
+  DELETE_COMMENT,
+  LIKE_COMMENT,
+  UNLIKE_COMMENT
 } from '../types';
 
 const initialState = {
@@ -44,11 +43,17 @@ export default function(state = initialState, action) {
       const index = state.posts.findIndex(
         (post) => post._id === action.payload.postId
       );
+      // console.log('like post index', index);
+      // console.log('like post', state.posts[index]);
       state.posts[index].likeCount = ++state.posts[index].likeCount;
       state.posts[index].likes.unshift(action.payload);
 
-      state.post.likeCount = ++state.post.likeCount;
-      state.post.likes.unshift(action.payload);
+      // console.log('like post', state.post);
+      if (state.post.likes) {
+        // console.log(state.post.likes);
+        state.post.likeCount = ++state.post.likeCount;
+        state.post.likes.unshift(action.payload);
+      }
       // console.log('likes', state.posts[index].likes);
       // console.log('like post', state.post);
       return {
@@ -63,12 +68,16 @@ export default function(state = initialState, action) {
       );
       // console.log('index?', index);
       state.posts[index].likeCount = --state.posts[index].likeCount;
-      state.post.likeCount = --state.post.likeCount;
+
       const unlikeIndex = state.posts[index].likes.findIndex(
         (like) => like._id === action.payload.unlikeId
       );
       state.posts[index].likes.splice(unlikeIndex, 1);
-      state.post.likes.splice(unlikeIndex, 1);
+
+      if (state.post.likes) {
+        state.post.likeCount = --state.post.likeCount;
+        state.post.likes.splice(unlikeIndex, 1);
+      }
       // console.log('likes', state.posts[index].likes);
       // console.log('like post', state.post);
       return {
@@ -107,15 +116,48 @@ export default function(state = initialState, action) {
       const postIndex = state.posts.findIndex(
         (post) => post._id === action.payload.postId
       );
-      // console.log('postIndex', postIndex);
       const commentIndex = state.posts[postIndex].comments.findIndex(
         (comment) => comment._id === action.payload.commentId
       );
-      // console.log('commentIndex', commentIndex);
       state.posts[postIndex].comments.splice(commentIndex, 1);
       state.posts[postIndex].commentCount = --state.posts[postIndex].commentCount;
       state.post.comments.splice(commentIndex, 1);
       state.post.commentCount = --state.post.commentCount;
+      return {
+        ...state
+      };
+    }
+    case LIKE_COMMENT: {
+      const postIndex = state.posts.findIndex(
+        (post) => post._id === action.payload.postId
+      );
+      const commentIndex = state.posts[postIndex].comments.findIndex(
+        (comment) => comment._id === action.payload.commentId
+      );
+      state.posts[postIndex].comments[commentIndex].likeCount = ++state.posts[postIndex].comments[commentIndex].likeCount;
+      state.posts[postIndex].comments[commentIndex].likes.unshift(action.payload);
+
+      state.post.comments[commentIndex].likeCount = ++state.post.comments[commentIndex].likeCount;
+      state.post.comments[commentIndex].likes.unshift(action.payload);
+      return {
+        ...state
+      };
+    }
+    case UNLIKE_COMMENT: {
+      const postIndex = state.posts.findIndex(
+        (post) => post._id === action.payload.postId
+      );
+      const commentIndex = state.posts[postIndex].comments.findIndex(
+        (comment) => comment._id === action.payload.commentId
+      );
+      const unlikeIndex = state.posts[postIndex].comments[commentIndex].likes.findIndex(
+        (like) => like._id === action.payload.unlikeId
+      );
+      state.posts[postIndex].comments[commentIndex].likeCount = --state.posts[postIndex].comments[commentIndex].likeCount;
+      state.posts[postIndex].comments[commentIndex].likes.splice(unlikeIndex, 1);
+
+      state.post.comments[commentIndex].likeCount = --state.post.comments[commentIndex].likeCount;
+      state.post.comments[commentIndex].likes.splice(unlikeIndex, 1);
       return {
         ...state
       };

@@ -4,7 +4,7 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import DeleteComment from './DeleteComment';
-import LikeButton from './LikeCommentButton';
+import LikeCommentButton from './LikeCommentButton';
 // MUI
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -26,19 +26,19 @@ const styles = (theme) => ({
 class Comments extends Component {
   render() {
     const isAuthenticated = window.localStorage.getItem('token');
-    const { comments, classes, postId, userId } = this.props;
+    const { comments, classes, userId } = this.props;
 
     return (
       <Grid container>
         {comments.map((comment, index) => {
-          const { body, createdAt, userImage, userName, _id } = comment;
+          const { body, createdAt, imageURL, userName, _id, likeCount, postId } = comment;
           return (
             <Fragment key={createdAt}>
               <Grid item sm={12}>
                 <Grid container>
                   <Grid item sm={2}>
                     <img
-                      src={userImage}
+                      src={imageURL}
                       alt="comment"
                       className={classes.commentImage}
                     />
@@ -56,6 +56,8 @@ class Comments extends Component {
                       {isAuthenticated && isAuthenticated === userId ? (
                         <DeleteComment postId={postId} commentId={_id} />
                       ) : null}
+                      <LikeCommentButton commentId={_id} postId={postId} />
+                      <span>{likeCount} likes</span>
                       <Typography variant="body2" color="textSecondary">
                         {dayjs(createdAt).format('h:mm a, MMMM DD YYYY')}
                       </Typography>
@@ -80,7 +82,7 @@ class Comments extends Component {
 Comments.propTypes = {
   comments: PropTypes.array.isRequired,
   classes: PropTypes.object.isRequired,
-  postId: PropTypes.string.isRequired,
+  // postId: PropTypes.string.isRequired,
   userId: PropTypes.string.isRequired
 };
 
