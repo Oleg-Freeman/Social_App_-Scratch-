@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import MyButton from '../../util/MyButton';
 import NewPost from '../post/AddPost';
+import Notifications from './notifications.component';
 
 // MUI stuff
 import AppBar from '@material-ui/core/AppBar';
@@ -25,7 +26,7 @@ export default class Navbar extends Component {
                   <HomeIcon />
                 </MyButton>
               </Link>
-              {/* <Notifications /> */}
+              <Notifications />
             </Fragment>
           ) : (
             <Fragment>

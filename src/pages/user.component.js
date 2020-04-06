@@ -41,7 +41,7 @@ class User extends Component {
 
   render() {
     const { posts, loading } = this.props.data;
-    // const { postIdParam } = this.state;
+    const { postIdParam } = this.state;
 
     // const postsMarkup = loading ? (
     //   <PostSkeleton />
@@ -62,8 +62,13 @@ class User extends Component {
       <p>Loading data...</p>
     ) : posts === null ? (
       <p>No posts from this user</p>
-    ) : (
+    ) : !postIdParam ? (
       posts.map((post, index) => <Post key={index} post={post} />)
+    ) : (
+      posts.map((post, index) => {
+        if (post._id !== postIdParam) return <Post key={index} post={post} />;
+        else return <Post key={post._id} post={post} openDialog />;
+      })
     );
 
     // return (

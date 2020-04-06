@@ -71,24 +71,24 @@ class PostDialog extends Component {
   }
 
   handleOpen() {
-    // let oldPath = window.location.pathname;
+    // console.log('userId', this.props.userId);
+    // console.log('postId', this.props.postId);
 
-    // const { userId, postId } = this.props;
-    // const newPath = `/users/${userId}/post/${postId}`;
+    let oldPath = window.location.pathname;
 
-    // if (oldPath === newPath) oldPath = `/users/${userId}`;
+    const { userId, postId } = this.props;
+    const newPath = `/users/${userId}/posts/${postId}`;
 
-    // window.history.pushState(null, null, newPath);
+    if (oldPath === newPath) oldPath = `/users/${userId}`;
 
-    // this.setState({ open: true, oldPath, newPath });
-    // this.props.getPost(this.props.postId);
+    window.history.pushState(null, null, newPath);
 
-    this.setState({ open: true });
+    this.setState({ open: true, oldPath, newPath });
     this.props.getPost(this.props.postId);
   };
 
   handleClose() {
-    // window.history.pushState(null, null, this.state.oldPath);
+    window.history.pushState(null, null, this.state.oldPath);
     this.setState({ open: false });
     this.props.clearErrors();
   };
@@ -184,7 +184,8 @@ PostDialog.propTypes = {
   userId: PropTypes.string.isRequired,
   post: PropTypes.object.isRequired,
   UI: PropTypes.object.isRequired,
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  openDialog: PropTypes.bool
 };
 
 const mapStateToProps = (state) => ({

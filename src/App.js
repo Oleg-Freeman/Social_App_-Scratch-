@@ -34,7 +34,8 @@ function App() {
               <Route path="/" exact component={Home} />
               <Route path="/register" exact component={Register} />
               <Route path="/login" exact component={Login} />
-              <Route path="/users/:userId" component={User} />
+              <Route path="/users/:userId" exact component={User} />
+              <Route path="/users/:userId/posts/:postId" exact component={User} />
 
             </Switch>
           </div>

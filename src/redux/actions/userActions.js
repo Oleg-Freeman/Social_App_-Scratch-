@@ -5,8 +5,9 @@ import {
   LOADING_UI,
   // SET_UNAUTHENTICATED,
   // SET_AUTHENTICATED,
-  LOADING_USER
-  // MARK_NOTIFICATIONS_READ
+  LOADING_USER,
+  MARK_NOTIFICATIONS_READ,
+  GET_USER_NOTIFICATIONS
 } from '../types';
 import axios from 'axios';
 // import Cookies from 'js-cookies';
@@ -87,6 +88,7 @@ export const getUserData = (userId) => (dispatch) => {
       .get(`http://localhost:5000/users/${userId.replace(/['"]+/g, '')}`)
       .then((res) => {
         // console.log('user', res.data);
+        // getUserNotifications(userId);
         dispatch({
           type: SET_USER,
           payload: res.data
@@ -137,19 +139,38 @@ export const editUserDetails = (userDetails) => (dispatch) => {
     .catch((err) => console.log(err));
 };
 
-// export const markNotificationsRead = (notificationIds) => (dispatch) => {
-//   axios
-//     .post('/notifications', notificationIds)
-//     .then((res) => {
-//       dispatch({
-//         type: MARK_NOTIFICATIONS_READ
-//       });
-//     })
-//     .catch((err) => console.log(err));
-// };
+export const markNotificationsRead = (notificationIds) => (dispatch) => {
+  console.log('mark notifications?');
+  const token = window.localStorage.getItem('token');
+  axios({
+    method: 'post',
+    url: 'http://localhost:5000/notifications',
+    data: notificationIds,
+    headers: { token: token.replace(/['"]+/g, '') }
+  })
+    .then((res) => {
+      console.log(res.data);
+      dispatch({
+        type: MARK_NOTIFICATIONS_READ
+      });
+    })
+    .catch((err) => console.log(err));
+};
 
-// const setAuthorizationHeader = (token) => {
-//   const FBIdToken = `Bearer ${token}`;
-//   localStorage.setItem('FBIdToken', FBIdToken);
-//   axios.defaults.headers.common.Authorization = FBIdToken;
-// };
+export const getUserNotifications = (userId) => (dispatch) => {
+  // console.log('userId', userId);
+  const token = window.localStorage.getItem('token');
+  axios({
+    method: 'get',
+    url: `http://localhost:5000/notifications/${userId}`,
+    headers: { token: token.replace(/['"]+/g, '') }
+  })
+    .then((res) => {
+      // console.log(res.data);
+      dispatch({
+        type: GET_USER_NOTIFICATIONS,
+        payload: res.data
+      });
+    })
+    .catch((err) => console.log(err));
+};

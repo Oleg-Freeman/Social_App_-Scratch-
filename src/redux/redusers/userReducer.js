@@ -2,10 +2,11 @@ import {
   SET_USER,
   SET_AUTHENTICATED,
   SET_UNAUTHENTICATED,
-  LOADING_USER
+  LOADING_USER,
   // LIKE_POST,
   // UNLIKE_POST
-//   MARK_NOTIFICATIONS_READ
+  MARK_NOTIFICATIONS_READ,
+  GET_USER_NOTIFICATIONS
 } from '../types';
 
 const initialState = {
@@ -14,7 +15,7 @@ const initialState = {
   credentials: {},
   // likes: [],
   notifications: [],
-  userId: ''
+  userId: 'testId'
 };
 
 export default function(state = initialState, action) {
@@ -55,11 +56,23 @@ export default function(state = initialState, action) {
     //       (like) => like.postId !== action.payload.postId
     //     )
     //   };
-    // case MARK_NOTIFICATIONS_READ:
-    //   state.notifications.forEach((not) => (not.read = true));
-    //   return {
-    //     ...state
-    //   };
+    case GET_USER_NOTIFICATIONS: {
+      // console.log(action.payload);
+      // state.notifications = [...action.payload];
+      // action.payload.forEach((not) => (state.notifications.push(not)));
+      state.notifications.push({ test: 'test' });
+      // console.log(state.notifications);
+      return {
+        ...state
+      };
+    }
+    case MARK_NOTIFICATIONS_READ: {
+      console.log('state.notifications', state.notifications);
+      state.notifications.forEach((not) => (not.read = true));
+      return {
+        ...state
+      };
+    }
     default:
       return state;
   }

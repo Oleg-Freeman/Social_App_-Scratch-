@@ -22,7 +22,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import KeyboardReturn from '@material-ui/icons/KeyboardReturn';
 // Redux
 import { connect } from 'react-redux';
-import { getUserData, logoutUser, uploadImage } from '../../redux/actions/userActions';
+import { getUserData, logoutUser, uploadImage, getUserNotifications } from '../../redux/actions/userActions';
 
 const styles = (theme) => ({
   // ...theme
@@ -81,6 +81,7 @@ class Profile extends Component {
 
   componentDidMount() {
     // console.log(this.props.history);
+    // this.props.getUserNotifications(window.localStorage.getItem('token'));
     this.props.getUserData(window.localStorage.getItem('token'));
   }
 
@@ -226,12 +227,13 @@ const mapStateToProps = (state) => ({
   user: state.user
 });
 
-const mapActionsToProps = { getUserData, logoutUser, uploadImage };
+const mapActionsToProps = { getUserData, logoutUser, uploadImage, getUserNotifications };
 
 Profile.propTypes = {
   logoutUser: PropTypes.func.isRequired,
   uploadImage: PropTypes.func.isRequired,
   getUserData: PropTypes.func.isRequired,
+  getUserNotifications: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired
