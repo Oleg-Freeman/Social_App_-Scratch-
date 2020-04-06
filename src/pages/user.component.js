@@ -26,7 +26,7 @@ class User extends Component {
     const postId = this.props.match.params.postId;
 
     if (postId) this.setState({ postIdParam: postId });
-    // console.log(userId);
+
     this.props.getUserData(userId);
     axios
       .get(`http://localhost:5000/users/${userId.replace(/['"]+/g, '')}`)
@@ -34,7 +34,6 @@ class User extends Component {
         this.setState({
           profile: res.data
         });
-        // console.log('profile', this.state.profile);
       })
       .catch((err) => console.log(err));
   }
@@ -42,21 +41,6 @@ class User extends Component {
   render() {
     const { posts, loading } = this.props.data;
     const { postIdParam } = this.state;
-
-    // const postsMarkup = loading ? (
-    //   <PostSkeleton />
-    // ) : posts === null ? (
-    //   <p>No posts from this user</p>
-    // ) : !postIdParam ? (
-    //   posts.map((post) => <post key={post.postId} post={post} />)
-    // ) : (
-    //   posts.map((post) => {
-    //     if (post.postId !== postIdParam) {
-    //       return <Post key={post.postId} post={post} />; // <Post key={post.postId} post={post} />;
-    //     }
-    //     else return <Post key={post.postId} post={post} openDialog />; // <Post key={post.postId} post={post} openDialog />;
-    //   })
-    // );
 
     const postsMarkup = loading ? (
       <p>Loading data...</p>
@@ -70,21 +54,6 @@ class User extends Component {
         else return <Post key={post._id} post={post} openDialog />;
       })
     );
-
-    // return (
-    //   <Grid container spacing={10}>
-    //     <Grid item sm={8} xs={12}>
-    //       {postsMarkup}
-    //     </Grid>
-    //     <Grid item sm={4} xs={12}>
-    //       {this.state.profile === null ? (
-    //         <ProfileSkeleton />
-    //       ) : (
-    //         <StaticProfile profile={this.state.profile} />
-    //       )}
-    //     </Grid>
-    //   </Grid>
-    // );
 
     return (
       <Grid container spacing={10}>

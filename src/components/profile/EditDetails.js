@@ -28,7 +28,6 @@ class EditDetails extends Component {
   constructor() {
     super();
 
-    // this.mapUserDetailsToState = this.mapUserDetailsToState.bind(this);
     this.handleOpen = this.handleOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -86,7 +85,6 @@ class EditDetails extends Component {
       location: this.state.location,
       birthDay: this.state.birthDay
     };
-    // console.log(userDetails);
     this.props.editUserDetails(userDetails);
     this.handleClose();
   };

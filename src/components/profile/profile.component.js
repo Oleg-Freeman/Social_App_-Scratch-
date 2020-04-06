@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
-// import Cookies from 'js-cookie';
 import EditDetails from './EditDetails';
 import MyButton from '../../util/MyButton';
 // import ProfileSkeleton from '../../util/profileSkeleton';
@@ -80,8 +79,6 @@ class Profile extends Component {
   }
 
   componentDidMount() {
-    // console.log(this.props.history);
-    // this.props.getUserNotifications(window.localStorage.getItem('token'));
     this.props.getUserData(window.localStorage.getItem('token'));
   }
 
@@ -90,7 +87,6 @@ class Profile extends Component {
     const formData = new window.FormData();
     formData.append('image', image, image.name);
     this.props.uploadImage(formData);
-    // console.log(formData);
   };
 
   handleEditPicture() {
@@ -110,17 +106,13 @@ class Profile extends Component {
       user: {
         credentials: { _id, userName, createdAt, imageURL, bio, website, location, birthDay },
         loading
-        // authenticated
       }
     } = this.props;
 
-    // console.log('Id: ', _id);
     let birthDayField = '';
-    // console.log(birthDay);
 
     if (birthDay) {
       birthDayField = dayjs(Date.now()).diff(birthDay, 'year') + ' yeras old';
-      // birthDay: Date.now()
     }
     else {
       birthDayField = '';

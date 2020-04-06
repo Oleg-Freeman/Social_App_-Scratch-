@@ -4,8 +4,6 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import AppIcon from '../images/icon.png';
-// import Cookies from 'js-cookie';
-// import axios from 'axios';
 
 // MUI Stuff
 import Grid from '@material-ui/core/Grid';
@@ -66,7 +64,6 @@ class Login extends Component {
   }
 
   componentDidMount() {
-    // console.log(this.props.history);
     if (window.localStorage.getItem('token')) {
       this.props.history.push('/');
     }
@@ -97,8 +94,6 @@ class Login extends Component {
     const { classes, UI: { loading } } = this.props;
     const { errors } = this.state;
     // const isAuthenticated = window.localStorage.getItem('isAuthenticated');
-    // const isAuthenticated = Cookies.get('user');
-    // console.log(isAuthenticated);
     // if (isAuthenticated) return <Redirect to='/'/>;
     return (
       <Grid container className={classes.form}>

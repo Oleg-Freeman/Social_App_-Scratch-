@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const Pusher = require('pusher');
 const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
 const Notification = require('../models/notification.model');
@@ -7,14 +6,6 @@ const User = require('../models/user.model');
 const { ensureAuthenticated, bodyValidation } = require('../middlewares/validation');
 
 require('dotenv').config({ path: './config/.env' });
-
-// Pusher config
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID,
-  key: process.env.PUSHER_KEY,
-  secret: process.env.PUSHER_SECRET,
-  cluster: 'eu'
-});
 
 // Get all comments from DB
 router.route('/').get(async(req, res) => {
@@ -105,9 +96,6 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
                   });
 
                   await newNotification.save(() => {
-                    pusher.trigger('Twitter', 'new-comment', {
-                    // message: 'hello world'
-                    });
                     res.json(newComment);
                   });
                 }

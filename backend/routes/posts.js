@@ -150,7 +150,6 @@ router.route('/update/:id').post(ensureAuthenticated, async(req, res) => {
           const { error } = bodyValidation(req.body);
           if (error) return res.status(400).json(error.details[0].message);
 
-          // posts.postId = req.body.postId;// _id: new mongoose.Types.ObjectId().toHexString(),
           post.body = req.body.body;
 
           await post.save(() => {

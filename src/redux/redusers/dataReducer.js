@@ -26,7 +26,6 @@ export default function(state = initialState, action) {
         loading: true
       };
     case SET_POSTS: {
-      // console.log('data reduser: ', state.posts);
       return {
         ...state,
         posts: action.payload,
@@ -39,34 +38,27 @@ export default function(state = initialState, action) {
         post: action.payload
       };
     case LIKE_POST: {
-      // console.log('action.payload', action.payload);
       const index = state.posts.findIndex(
         (post) => post._id === action.payload.postId
       );
-      // console.log('like post index', index);
-      // console.log('like post', state.posts[index]);
+
       state.posts[index].likeCount = ++state.posts[index].likeCount;
       state.posts[index].likes.unshift(action.payload);
 
-      // console.log('like post', state.post);
       if (state.post.likes) {
-        // console.log(state.post.likes);
         state.post.likeCount = ++state.post.likeCount;
         state.post.likes.unshift(action.payload);
       }
-      // console.log('likes', state.posts[index].likes);
-      // console.log('like post', state.post);
+
       return {
         ...state
       };
     }
     case UNLIKE_POST: {
-      // console.log('_id1', state.posts[0]._id);
-      // console.log('_id2', action.payload.postId);
       const index = state.posts.findIndex(
         (post) => post._id === action.payload.postId
       );
-      // console.log('index?', index);
+
       state.posts[index].likeCount = --state.posts[index].likeCount;
 
       const unlikeIndex = state.posts[index].likes.findIndex(
@@ -78,8 +70,7 @@ export default function(state = initialState, action) {
         state.post.likeCount = --state.post.likeCount;
         state.post.likes.splice(unlikeIndex, 1);
       }
-      // console.log('likes', state.posts[index].likes);
-      // console.log('like post', state.post);
+
       return {
         ...state
       };

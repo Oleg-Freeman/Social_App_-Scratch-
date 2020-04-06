@@ -71,9 +71,6 @@ class PostDialog extends Component {
   }
 
   handleOpen() {
-    // console.log('userId', this.props.userId);
-    // console.log('postId', this.props.postId);
-
     let oldPath = window.location.pathname;
 
     const { userId, postId } = this.props;

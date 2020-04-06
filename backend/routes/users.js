@@ -45,15 +45,15 @@ router.route('/').get(async(req, res) => {
     await User.find()
       .select('-password -__v')
       .sort({ createdAt: -1 })
-      // .populate({
-      //   path: 'posts',
-      //   populate: {
-      //     path: 'comments likes',
-      //     populate: {
-      //       path: 'likes'
-      //     }
-      //   }
-      // })
+      .populate({
+        path: 'posts',
+        populate: {
+          path: 'comments likes',
+          populate: {
+            path: 'likes'
+          }
+        }
+      })
       .exec((err, users) => {
         if (err) return res.status(400).json('Error: ' + err);
         else if (users === null || users.length === 0) return res.status(400).json('No any registered users found');
@@ -67,12 +67,11 @@ router.route('/').get(async(req, res) => {
 
 // Register new user
 router.route('/register').post(isloggedIn, async(req, res) => {
-  // eslint-disable-next-line no-unused-vars
-  const { email, password, password2, userName } = req.body;
+  const { email, password, userName } = req.body;
 
   // Validate data
   const { error } = registerValidation(req.body);
-  // if (error) return res.status(400).json(error.details[0].message);
+
   if (error && error.details[0].path[0] === 'email') {
     return res.status(400).json({
       email: error.details[0].message,
@@ -187,7 +186,6 @@ router.route('/logout/:id').get(async(req, res) => {
 // Get one user by ID
 router.route('/:id').get(async(req, res) => {
   try {
-    // console.log(req.session.user);
     await User.findById(req.params.id)
       .select('-password -__v')
       .populate({
@@ -229,9 +227,7 @@ router.route('/:id').delete(ensureAuthenticated, (req, res) => {
 router.route('/image').post(ensureAuthenticated, upload.single('image'), async(req, res) => { // ensureAuthenticated,
   try {
     const token = req.headers.token;
-    // console.log(token);
     await cloudinary.uploader.upload(req.file.path, async(error, result) => {
-      // console.log(req);
       if (error) {
         return res.status(400).json('Error in image upload - ' + error);
       }

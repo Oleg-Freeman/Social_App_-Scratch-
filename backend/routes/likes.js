@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const Pusher = require('pusher');
 const Like = require('../models/like.model');
 const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
@@ -8,13 +7,6 @@ const User = require('../models/user.model');
 const { ensureAuthenticated } = require('../middlewares/validation');
 
 require('dotenv').config({ path: './config/.env' });
-
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID,
-  key: process.env.PUSHER_KEY,
-  secret: process.env.PUSHER_SECRET,
-  cluster: 'eu'
-});
 
 // Get all likes
 router.route('/').get(async(req, res) => {
@@ -90,13 +82,18 @@ router.route('/add/:postId').get(ensureAuthenticated, async(req, res) => {
                         notificationType
                       });
 
-                      await newNotification.save(() => {
-                        pusher.trigger('Twitter', 'like-post', {
-                          // message: 'hello world'
-                        });
+                      await newNotification.save(async() => {
                         // res.json(`Liked by ${user.userName}`);
-                        // res.json({ newLikeId: newLike._id });
-                        res.json(newLike);
+                        await User.findById(post.userId)
+                          .exec(async(err, receiver) => {
+                            if (err) return res.status(400).json('Error: ' + err);
+                            else if (receiver === null) return res.status(400).json('Internal error');
+                            else {
+                              receiver.notifications.unshift(newNotification._id);
+                              await receiver.save();
+                              res.json(newLike);
+                            }
+                          });
                       });
                     }
                   });
@@ -137,24 +134,39 @@ router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
                   post.likeCount = --post.likeCount;
                   post.likes.splice(toDelete, 1);
 
-                  return post.save(err => {
-                    if (err) console.log(err);
-                    res.json(liked._id);
+                  await post.save(async() => {
+                    await Notification.findOneAndDelete({
+                      senderId: token,
+                      postId: req.params.postId,
+                      notificationType: 'like-post'
+                    })
+                      .exec(async(err, notification) => {
+                        if (err) return res.status(400).json('Error: ' + err);
+                        if (notification === null) return res.status(400).json('Internal error');
+                        else {
+                          await User.findById(post.userId)
+                            .exec(async(err, receiver) => {
+                              if (err) return res.status(400).json('Error: ' + err);
+                              else if (receiver === null) return res.status(400).json('Internal error');
+                              else {
+                                const toDeleteNote = receiver.notifications.findIndex(not => {
+                                  return not.toString() === notification._id.toString();
+                                });
+
+                                if (toDeleteNote !== -1) {
+                                  receiver.notifications.splice(toDeleteNote, 1);
+                                  await receiver.save();
+                                }
+                              }
+                            });
+                          res.json(liked._id);
+                        }
+                      });
                   });
                 }
               }
             });
         }
-      });
-    await Notification.findOneAndDelete({
-      senderId: token,
-      postId: req.params.postId,
-      notificationType: 'like-post'
-    })
-      .exec((err, notification) => {
-        if (err) return res.status(400).json('Error: ' + err);
-        if (notification === null) return res.status(400).json('Internal error');
-        // else return res.json('Unliked');
       });
   }
   catch (err) {
@@ -224,12 +236,18 @@ router.route('/comments/add/:commentId').get(ensureAuthenticated, async(req, res
                         notificationType
                       });
 
-                      await newNotification.save(() => {
-                        pusher.trigger('Twitter', 'like-comment', {
-                          // message: 'hello world'
-                        });
+                      await newNotification.save(async() => {
+                        await User.findById(comment.userId)
+                          .exec(async(err, receiver) => {
+                            if (err) return res.status(400).json('Error: ' + err);
+                            else if (receiver === null) return res.status(400).json('Internal error');
+                            else {
+                              receiver.notifications.unshift(newNotification._id);
+                              await receiver.save();
+                              res.json(newLike);
+                            }
+                          });
                         // res.json(`Liked by ${user.userName}`);
-                        res.json(newLike);
                       });
                     }
                   });
@@ -272,23 +290,39 @@ router.route('/comments/:commentId').delete(ensureAuthenticated, async(req, res)
                   comment.likeCount = --comment.likeCount;
                   comment.likes.splice(toDelete, 1);
 
-                  await comment.save(() => {
-                    res.json(liked);
+                  await comment.save(async() => {
+                    await Notification.findOneAndDelete({
+                      commentId: req.params.commentId,
+                      senderId: token,
+                      notificationType: 'like-comment'
+                    })
+                      .exec(async(err, notification) => {
+                        if (err) return res.status(400).json('Error: ' + err);
+                        if (notification === null) return res.status(400).json('Internal error');
+                        else {
+                          await User.findById(comment.userId)
+                            .exec(async(err, receiver) => {
+                              if (err) return res.status(400).json('Error: ' + err);
+                              else if (receiver === null) return res.status(400).json('Internal error');
+                              else {
+                                const toDeleteNote = receiver.notifications.findIndex(not => {
+                                  return not.toString() === notification._id.toString();
+                                });
+
+                                if (toDeleteNote !== -1) {
+                                  receiver.notifications.splice(toDeleteNote, 1);
+                                  await receiver.save();
+                                  res.json(liked);
+                                }
+                              }
+                            });
+                        }
+                      });
                   });
                 }
               }
             });
         }
-      });
-    await Notification.findOneAndDelete({
-      commentId: req.params.commentId,
-      senderId: token,
-      notificationType: 'like-comment'
-    })
-      .exec((err, notification) => {
-        if (err) return res.status(400).json('Error: ' + err);
-        if (notification === null) return res.status(400).json('Internal error');
-        // else return res.json('Unliked');
       });
   }
   catch (err) {

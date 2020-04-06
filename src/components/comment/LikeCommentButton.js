@@ -23,23 +23,18 @@ export class LikeCommentButton extends Component {
   }
 
   likedComment() {
-    // console.log('postId', this.props.postId);
     const userId = window.localStorage.getItem('token');
     const pId = this.props.data.posts.findIndex(post => post._id === this.props.postId);
     const comment = this.props.data.posts[pId].comments.find(comment => comment._id === this.props.commentId);
-    // console.log('comment', comment);
     if (comment) {
       if (comment.likes.find(like => like.userId === userId.replace(/['"]+/g, ''))) {
-        // console.log(true);
         return true;
       }
       else {
-        // console.log(false);
         return false;
       }
     }
     else {
-      // console.log(false);
       return false;
     }
   };

@@ -59,10 +59,8 @@ class Post extends Component {
         userId
       }
     } = this.props;
-    // const currentUserId = this.props.user.credentials._id;
+
     const isAuthenticated = window.localStorage.getItem('token');
-    // console.log('post-userId', userId);
-    // console.log('localstorage-userId', isAuthenticated);
 
     const deleteButton = isAuthenticated && isAuthenticated === userId ? (
       <DeletePost postId={_id} />

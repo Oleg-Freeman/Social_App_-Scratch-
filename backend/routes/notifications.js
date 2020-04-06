@@ -40,8 +40,6 @@ router.route('/').post(ensureAuthenticated, async(req, res) => {
     console.log(req.body);
     await Notification.updateMany({ _id: { $in: req.body } }, { read: true })
       .exec((err, notifications) => {
-        // console.log(notifications);
-
         if (err) return res.status(400).json('Error: ' + err);
         else if (notifications === null || notifications.nModified === 0) return res.status(400).json('Notifications not found');
         else return res.json('Marked as read');

@@ -2,9 +2,7 @@
 import React, { Component } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
-// import { Link } from 'react-router-dom';
 import AppIcon from '../images/icon.png';
-// import axios from 'axios';
 
 // MUI Stuff
 import Grid from '@material-ui/core/Grid';
@@ -68,7 +66,6 @@ class Register extends Component {
   }
 
   componentDidMount() {
-    // console.log(this.props.history);
     if (window.localStorage.getItem('token')) {
       this.props.history.push('/');
     }
@@ -103,7 +100,6 @@ class Register extends Component {
     const { errors } = this.state;
 
     // const isAuthenticated = window.localStorage.getItem('isAuthenticated');
-
     // if (isAuthenticated) return this.props.history.push('/');
 
     return (

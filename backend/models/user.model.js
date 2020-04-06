@@ -36,6 +36,10 @@ const userSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Posts'
   }],
+  notifications: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Notifications'
+  }],
   isAuthenticated: {
     type: Boolean,
     required: true,

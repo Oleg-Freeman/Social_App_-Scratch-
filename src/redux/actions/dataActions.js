@@ -19,12 +19,10 @@ import axios from 'axios';
 
 // Get all posts
 export const getPosts = () => (dispatch) => {
-  // console.log('data action getPosts()');
   dispatch({ type: LOADING_DATA });
   axios
     .get('http://localhost:5000/posts')
     .then((res) => {
-      // console.log('retrived posts: ', res.data);
       dispatch({
         type: SET_POSTS,
         payload: res.data
@@ -44,7 +42,6 @@ export const getPost = (postId) => (dispatch) => {
   axios
     .get(`http://localhost:5000/posts/${postId}`)
     .then((res) => {
-      // console.log(res.data);
       dispatch({
         type: SET_POST,
         payload: res.data
@@ -71,7 +68,6 @@ export const addPost = (newPost) => (dispatch) => {
       dispatch(clearErrors());
     })
     .catch((err) => {
-      // console.log('Not valid body', err.response.data);
       dispatch({
         type: SET_ERRORS,
         payload: err.response.data
@@ -87,8 +83,6 @@ export const likePost = (postId) => (dispatch) => {
     headers: { token: token.replace(/['"]+/g, '') }
   })
     .then((res) => {
-      // console.log('like post', res.data);
-      // dispatch(getPosts());
       dispatch({
         type: LIKE_POST,
         payload: res.data
@@ -105,8 +99,6 @@ export const unlikePost = (postId) => (dispatch) => {
     headers: { token: token.replace(/['"]+/g, '') }
   })
     .then((res) => {
-      // console.log('Unlike post');
-      // dispatch(getPosts());
       dispatch({
         type: UNLIKE_POST,
         payload: {
@@ -168,8 +160,6 @@ export const likeComment = (commentId) => (dispatch) => {
     headers: { token: token.replace(/['"]+/g, '') }
   })
     .then((res) => {
-      // console.log('like post');
-      // dispatch(getPosts());
       dispatch({
         type: LIKE_COMMENT,
         payload: res.data
@@ -186,8 +176,6 @@ export const unlikeComment = (commentId) => (dispatch) => {
     headers: { token: token.replace(/['"]+/g, '') }
   })
     .then((res) => {
-      // console.log('Unlike post');
-      // dispatch(getPosts());
       dispatch({
         type: UNLIKE_COMMENT,
         payload: res.data

@@ -45,7 +45,6 @@ module.exports = {
   },
 
   isloggedIn: async(req, res, next) => {
-    // console.log(req.headers.token);
     if (req.headers.token) {
       await User.findById(req.headers.token)
         .exec((err, user) => {

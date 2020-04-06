@@ -3,14 +3,11 @@ import {
   SET_ERRORS,
   CLEAR_ERRORS,
   LOADING_UI,
-  // SET_UNAUTHENTICATED,
-  // SET_AUTHENTICATED,
   LOADING_USER,
   MARK_NOTIFICATIONS_READ,
   GET_USER_NOTIFICATIONS
 } from '../types';
 import axios from 'axios';
-// import Cookies from 'js-cookies';
 
 export const loginUser = (userData, history) => (dispatch) => {
   dispatch({ type: LOADING_UI });
@@ -24,7 +21,6 @@ export const loginUser = (userData, history) => (dispatch) => {
       else {
         dispatch({ type: CLEAR_ERRORS });
         window.localStorage.setItem('token', res.data); // JSON.stringify(res.data._id)
-        // console.log(currentUser);
         // dispatch({ type: SET_AUTHENTICATED });
         dispatch({
           type: SET_USER,
@@ -44,8 +40,6 @@ export const registerUser = (newUserData, history) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   axios.post('http://localhost:5000/users/register', newUserData)
     .then((res) => {
-    //   setAuthorizationHeader(res.data.token);
-      // dispatch(getUserData());
       dispatch({ type: CLEAR_ERRORS });
       history.push('/login');
     })
@@ -58,7 +52,6 @@ export const registerUser = (newUserData, history) => (dispatch) => {
 };
 
 export const logoutUser = (history) => () => {
-  // console.log('token', token);
   const token = window.localStorage.getItem('token');
   axios.get(`http://localhost:5000/users/logout/${token.replace(/['"]+/g, '')}`)
     .then(res => {
@@ -82,13 +75,10 @@ export const logoutUser = (history) => () => {
 
 export const getUserData = (userId) => (dispatch) => {
   dispatch({ type: LOADING_USER });
-  // console.log('userId', userId.replace(/['"]+/g, ''));
   if (userId) {
     axios
       .get(`http://localhost:5000/users/${userId.replace(/['"]+/g, '')}`)
       .then((res) => {
-        // console.log('user', res.data);
-        // getUserNotifications(userId);
         dispatch({
           type: SET_USER,
           payload: res.data
@@ -115,7 +105,6 @@ export const uploadImage = (formData) => (dispatch) => {
   })
     .then(() => {
       dispatch(getUserData(token));
-      // window.location.reload();
     })
     .catch((err) => console.log(err));
 };
@@ -158,7 +147,6 @@ export const markNotificationsRead = (notificationIds) => (dispatch) => {
 };
 
 export const getUserNotifications = (userId) => (dispatch) => {
-  // console.log('userId', userId);
   const token = window.localStorage.getItem('token');
   axios({
     method: 'get',
@@ -166,7 +154,6 @@ export const getUserNotifications = (userId) => (dispatch) => {
     headers: { token: token.replace(/['"]+/g, '') }
   })
     .then((res) => {
-      // console.log(res.data);
       dispatch({
         type: GET_USER_NOTIFICATIONS,
         payload: res.data
